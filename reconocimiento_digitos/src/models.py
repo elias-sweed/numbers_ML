@@ -141,13 +141,22 @@ def build_mlp() -> Any:
     return model
 
 
-def build_cnn() -> Any:
+def build_cnn(
+    filters: tuple[int, int] = (32, 64),
+    dropout_conv: float = 0.25,
+    dropout_dense: float = 0.50,
+    learning_rate: float | None = None,
+) -> Any:
     """CNN con dos bloques convolucionales, MaxPooling, Flatten y Dense.
 
-    Arquitectura:
+    Arquitectura por defecto:
     Conv2D(32) -> BatchNorm -> Conv2D(32) -> MaxPool -> Dropout
     Conv2D(64) -> BatchNorm -> Conv2D(64) -> MaxPool -> Dropout
     Flatten -> Dense(128, ReLU) -> Dropout -> Dense(10, Softmax)
+
+    Los argumentos permiten ejecutar experimentos de ajuste de
+    hiperparámetros sin duplicar la arquitectura. Los valores por defecto
+    reproducen exactamente el modelo CNN original del proyecto.
 
     Se usa ReLU en las capas ocultas, Softmax en la salida, Adam como
     optimizador y entropía cruzada categórica dispersa como pérdida.
@@ -155,31 +164,42 @@ def build_cnn() -> Any:
     from tensorflow import keras
     from tensorflow.keras import layers
 
+    filters_1, filters_2 = (int(filters[0]), int(filters[1]))
+    if filters_1 <= 0 or filters_2 <= 0:
+        raise ValueError("La cantidad de filtros debe ser positiva.")
+    if not 0.0 <= float(dropout_conv) < 1.0:
+        raise ValueError("dropout_conv debe estar en [0, 1).")
+    if not 0.0 <= float(dropout_dense) < 1.0:
+        raise ValueError("dropout_dense debe estar en [0, 1).")
+    lr = config.CNN_LEARNING_RATE if learning_rate is None else float(learning_rate)
+    if lr <= 0:
+        raise ValueError("learning_rate debe ser positivo.")
+
     model = keras.Sequential(
         [
             keras.Input(shape=(config.IMAGE_SIZE, config.IMAGE_SIZE, 1), name="imagen"),
             # Bloque convolucional 1
-            layers.Conv2D(32, (3, 3), padding="same", activation="relu", name="conv_1"),
+            layers.Conv2D(filters_1, (3, 3), padding="same", activation="relu", name="conv_1"),
             layers.BatchNormalization(name="bn_1"),
-            layers.Conv2D(32, (3, 3), padding="same", activation="relu", name="conv_2"),
+            layers.Conv2D(filters_1, (3, 3), padding="same", activation="relu", name="conv_2"),
             layers.MaxPooling2D((2, 2), name="pool_1"),
-            layers.Dropout(0.25, name="dropout_conv_1"),
+            layers.Dropout(float(dropout_conv), name="dropout_conv_1"),
             # Bloque convolucional 2
-            layers.Conv2D(64, (3, 3), padding="same", activation="relu", name="conv_3"),
+            layers.Conv2D(filters_2, (3, 3), padding="same", activation="relu", name="conv_3"),
             layers.BatchNormalization(name="bn_2"),
-            layers.Conv2D(64, (3, 3), padding="same", activation="relu", name="conv_4"),
+            layers.Conv2D(filters_2, (3, 3), padding="same", activation="relu", name="conv_4"),
             layers.MaxPooling2D((2, 2), name="pool_2"),
-            layers.Dropout(0.25, name="dropout_conv_2"),
+            layers.Dropout(float(dropout_conv), name="dropout_conv_2"),
             # Clasificador
             layers.Flatten(name="flatten"),
             layers.Dense(128, activation="relu", name="densa"),
-            layers.Dropout(0.50, name="dropout_densa"),
+            layers.Dropout(float(dropout_dense), name="dropout_densa"),
             layers.Dense(config.NUM_CLASSES, activation="softmax", name="salida"),
         ],
         name="cnn_mnist",
     )
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=config.CNN_LEARNING_RATE),
+        optimizer=keras.optimizers.Adam(learning_rate=lr),
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"],
     )

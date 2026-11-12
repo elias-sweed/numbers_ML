@@ -1,13 +1,13 @@
 # ============================================================================
-# DOCUMENTACION.env
+# DOCUMENTACION.md
 # Documentación completa del proyecto
 # Sistema Inteligente de Reconocimiento y Clasificación de Dígitos Manuscritos
 # ============================================================================
 #
 # IMPORTANTE:
-# Este archivo NO contiene secretos ni variables de entorno reales. Aunque usa
-# la extensión .env, su contenido es documentación técnica en texto plano.
-# No debe cargarse con python-dotenv ni usarse como configuración ejecutable.
+# Este archivo es documentación técnica en Markdown. No contiene secretos ni
+# variables de entorno reales. El nombre oficial es DOCUMENTACION.md y todas
+# las referencias internas apuntan a ese único nombre.
 #
 # Proyecto...........: reconocimiento_digitos
 # Ruta...............: C:\Users\elias\Documents\SARA\reconocimiento_digitos
@@ -83,7 +83,10 @@
 #   8. Genera gráficos, informes y un resumen en Markdown.
 #   9. Ofrece una interfaz Streamlit moderna con cinco pestañas.
 #  10. Incluye una demostración end-to-end con imágenes sintéticas.
-#  11. Incluye 31 pruebas unitarias, todas aprobadas.
+#  11. Ejecuta 9 experimentos reales de hiperparámetros de la CNN, con
+#      selección exclusiva por validación.
+#  12. Incluye infraestructura para probar fotografías reales de papel.
+#  13. Incluye 41 pruebas unitarias, todas aprobadas.
 #
 # Resultado principal:
 #
@@ -170,7 +173,7 @@
 #
 # FASE 03 - Preprocesamiento
 #   Implementación: src/preprocessing.py y src/segmentation.py.
-#   Evidencia: 31 pruebas unitarias y pipeline end-to-end.
+#   Evidencia: 41 pruebas unitarias y pipeline end-to-end.
 #
 # FASE 04 - Algoritmos obligatorios
 #   Implementación: src/models.py y src/training.py.
@@ -186,8 +189,8 @@
 #   Evidencia: results/metrics.csv y results/cross_validation.csv.
 #
 # FASE 07 - Gráficos
-#   Implementación: src/evaluation.py.
-#   Evidencia: 28 archivos PNG en plots/.
+#   Implementación: src/evaluation.py y src/tuning.py.
+#   Evidencia: 29 archivos PNG en plots/.
 #
 # FASE 08 - Software Streamlit
 #   Implementación: app.py.
@@ -202,7 +205,16 @@
 #
 # FASE 11 - Pruebas y verificación
 #   Implementación: tests/.
-#   Evidencia: 31 pruebas aprobadas en 5.49 segundos.
+#   Evidencia: 41 pruebas aprobadas en 4.913 segundos.
+#
+# FASE 12 - Ajuste de hiperparámetros de la CNN
+#   Implementación: src/tuning.py y `python main.py tune-cnn`.
+#   Evidencia: 9 experimentos reales, results/cnn_tuning.csv y TUNING_CNN.md.
+#   Selección exclusivamente por validación; test no utilizado.
+#
+# FASE 13 - Prueba con fotografías reales
+#   Implementación: src/real_test.py y `python main.py real-test`.
+#   Evidencia: infraestructura y pruebas unitarias; pendiente de fotos reales.
 #
 # ============================================================================
 
@@ -275,6 +287,31 @@
 #   Divisiones estratificadas con random_state fijo.
 #   random_state en todos los modelos que lo permiten.
 #   TensorFlow puede variar en el último decimal por oneDNN y paralelismo.
+#
+# 04.11. Ajuste de hiperparámetros de la CNN con validación
+#
+#   La CNN no se selecciona con el test. Se añadió un experimento comparativo
+#   real (`python main.py tune-cnn`) que entrena variantes sobre un subconjunto
+#   estratificado de 20 000 imágenes de entrenamiento y evalúa siempre con el
+#   conjunto de validación de 6 000 imágenes. El test permanece intacto.
+#
+#   Factores variados, uno por experimento respecto a la base:
+#     - learning rate: 5e-4, 1e-3 (base), 2e-3;
+#     - filtros: 16/32, 32/64 (base), 48/96;
+#     - dropout: 0.15/0.35, 0.25/0.50 (base), 0.35/0.60;
+#     - batch size: 64, 128 (base), 256.
+#
+#   Criterio: mayor accuracy de validación; desempate por menor val_loss en la
+#   mejor época. La CNN de producción conserva su entrenamiento original con
+#   54 000 imágenes y 12 épocas. Los experimentos no sobrescriben
+#   models/cnn.keras ni results/metrics.csv.
+#
+# 04.12. Fotografías reales frente a muestras sintéticas
+#
+#   No se incluyen fotografías reales en el repositorio. `src/real_test.py`
+#   permite incorporarlas mediante data/real_photos/manifest.csv y solo acepta
+#   filas con tipo=foto_real. Las composiciones de data/samples/ son sintéticas
+#   y nunca se presentan como fotos de papel.
 #
 # ============================================================================
 
@@ -361,8 +398,8 @@
 # |     Comparación, K-Means y Guía.
 # |
 # +-- main.py
-# |     Punto de entrada CLI. Comandos: prepare, train, evaluate, demo,
-# |     predict, info y all.
+# |     Punto de entrada CLI. Comandos: prepare, train, evaluate, tune-cnn,
+# |     demo, real-test, predict, info y all.
 # |
 # +-- config.py
 # |     Rutas, semillas, hiperparámetros y nombres de artefactos.
@@ -373,7 +410,7 @@
 # +-- README.md
 # |     Documentación académica y guía de uso.
 # |
-# +-- DOCUMENTACION.env
+# +-- DOCUMENTACION.md
 # |     Este documento técnico completo.
 # |
 # +-- .gitignore
@@ -396,6 +433,10 @@
 # |   +-- evaluation.py
 # |   |     Métricas, matrices, curvas, comparación, validación cruzada,
 # |   |     evaluación de K-Means y gráficos.
+# |   +-- tuning.py
+# |   |     Experimentos reales de hiperparámetros de la CNN con validación.
+# |   +-- real_test.py
+# |   |     Prueba con fotografías reales mediante manifiesto.
 # |   +-- prediction.py
 # |   |     Carga de imágenes, EXIF, transparencia, inferencia y confianza.
 # |   +-- demo.py
@@ -413,10 +454,17 @@
 # |
 # +-- results/
 # |   +-- RESUMEN.md
+# |   +-- INFORME_FINAL.md
 # |   +-- metrics.csv
 # |   +-- cross_validation.csv
 # |   +-- kmeans_metrics.json
 # |   +-- demo_predictions.json
+# |   +-- cnn_tuning.csv
+# |   +-- cnn_tuning.json
+# |   +-- TUNING_CNN.md
+# |   +-- tuning/history_<experimento>.csv
+# |   +-- REAL_PHOTOS.md
+# |   +-- real_photos_results.json
 # |   +-- classification_<modelo>.csv
 # |   +-- classification_report_<modelo>.txt
 # |   +-- history_mlp.csv
@@ -436,20 +484,26 @@
 # |   +-- kmeans_confusion.png
 # |   +-- demo_predictions.png
 # |   +-- demo_annotated_*.png
+# |   +-- cnn_tuning.png
 # |
 # +-- data/
 # |   +-- mnist_split.npz
 # |   +-- dataset_info.json
+# |   +-- FUENTES_Y_TIPOS_DE_DATOS.md
 # |   +-- labels/
 # |   |   +-- train_labels.csv
 # |   |   +-- validation_labels.csv
 # |   |   +-- test_labels.csv
 # |   +-- samples/
-# |       +-- demo_manifest.json
-# |       +-- digito_0.png ... digito_9.png
-# |       +-- numero_2026.png
-# |       +-- numero_31415.png
-# |       +-- numero_789.png
+# |   |   +-- demo_manifest.json
+# |   |   +-- digito_0.png ... digito_9.png
+# |   |   +-- numero_2026.png
+# |   |   +-- numero_31415.png
+# |   |   +-- numero_789.png
+# |   +-- real_photos/
+# |       +-- LEEME.md
+# |       +-- manifest.csv
+# |       +-- (fotografías reales del usuario)
 # |
 # +-- tests/
 #     +-- __init__.py
@@ -457,6 +511,8 @@
 #     +-- test_prediction.py
 #     +-- test_preprocessing.py
 #     +-- test_segmentation.py
+#     +-- test_tuning.py
+#     +-- test_real_test.py
 #
 # ============================================================================
 
@@ -582,6 +638,30 @@
 #   Caché.....: ~/.keras/datasets/mnist.npz
 #   Formato...: 28x28 píxeles, 1 canal, uint8, valores 0-255
 #   Clases....: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+#
+# 08.01.b. Naturaleza y tipos de datos
+#
+#   MNIST es un dataset público descargado de internet. No son fotografías
+#   tomadas para este proyecto.
+#
+#   El proyecto diferencia tres categorías:
+#
+#     - Datos originales MNIST:
+#         data/mnist_split.npz, data/labels/.
+#         Se usan para entrenamiento, validación y test.
+#
+#     - Muestras sintéticas:
+#         data/samples/.
+#         Composiciones de MNIST con rotación, ruido y desenfoque.
+#         No son fotografías reales.
+#
+#     - Fotografías reales:
+#         data/real_photos/.
+#         Fotos de papel aportadas por el usuario.
+#         Se procesan con `python main.py real-test`.
+#         Actualmente no hay fotos reales en el repositorio.
+#
+#   Documento detallado: data/FUENTES_Y_TIPOS_DE_DATOS.md.
 #
 # 08.02. División utilizada
 #
@@ -988,6 +1068,14 @@
 #   Parámetros.......: 468 010 entrenables.
 #   Artefacto........: models/cnn.keras
 #
+# 11.06.b. CNN configurable para experimentos
+#
+#   `build_cnn(filters, dropout_conv, dropout_dense, learning_rate)` permite
+#   variar la arquitectura sin duplicar código. Los valores por defecto
+#   (32/64, 0.25, 0.50, 1e-3) reproducen exactamente el modelo de producción.
+#   Los experimentos se ejecutan desde src/tuning.py y no modifican el
+#   artefacto models/cnn.keras.
+#
 # 11.07. Detección de modelos Keras
 #
 #   is_keras_model comprueba la presencia de predict, fit y layers.
@@ -1252,6 +1340,63 @@
 #   results/classification_report_<modelo>.txt
 #   results/classification_<modelo>.csv
 #   results/RESUMEN.md
+#
+# 14.06. Ajuste de hiperparámetros de la CNN (experimentos reales)
+#
+#   Ejecución real: 11/11/2026, semilla 42, 20 000 imágenes de train
+#   estratificadas, 6 000 de validación, 5 épocas por experimento. El test no
+#   se usó.
+#
+#   Experimento      Factor        LR     Filtros  Dropout     Batch  val_acc  val_loss  Época
+#   dropout_bajo     dropout       1e-3   32/64    0.15/0.35   128    98.55 %  0.0558    5
+#   batch_64         batch size    1e-3   32/64    0.25/0.50   64     98.40 %  0.0740    5
+#   lr_5e-4          learning rate 5e-4   32/64    0.25/0.50   128    98.30 %  0.0601    5
+#   filtros_16_32    filtros       1e-3   16/32    0.25/0.50   128    98.18 %  0.0639    5
+#   lr_2e-3          learning rate 2e-3   32/64    0.25/0.50   128    98.07 %  0.0660    5
+#   dropout_alto     dropout       1e-3   32/64    0.35/0.60   128    97.83 %  0.0837    4
+#   filtros_48_96    filtros       1e-3   48/96    0.25/0.50   128    97.63 %  0.0892    5
+#   base             base          1e-3   32/64    0.25/0.50   128    97.60 %  0.0869    5
+#   batch_256        batch size    1e-3   32/64    0.25/0.50   256    95.68 %  0.2250    5
+#
+#   Configuración seleccionada: dropout_bajo (filtros 32/64, dropout 0.15/0.35,
+#   LR 1e-3, batch 128). Mayor val_acc (98.55 %) y menor val_loss (0.0558),
+#   con +0.95 puntos sobre la base y 468 010 parámetros, igual que la base.
+#
+#   Justificación:
+#     - Una regularización más suave converge más rápido en 5 épocas.
+#     - Batch 64 queda muy cerca, pero cuesta más por época.
+#     - 16/32 mantiene rendimiento con 218 586 parámetros (la mitad).
+#     - 48/96 no converge en 5 épocas: 77.9 % de accuracy de train.
+#     - Batch 256 empeora claramente; dropout alto queda por debajo de la
+#       configuración elegida.
+#
+#   La configuración queda como candidata. No se sobrescribió la CNN de
+#   producción (54 000 imágenes, 12 épocas, 99.61 % en test). Para adoptarla
+#   habría que reentrenar con el train completo, reevaluar en test y actualizar
+#   models/cnn.keras.
+#
+#   Limitación: cribado comparativo con 5 épocas; las diferencias entre las
+#   primeras configuraciones son pequeñas y dependen de la inicialización.
+#
+#   Archivos:
+#     results/cnn_tuning.csv
+#     results/cnn_tuning.json
+#     results/TUNING_CNN.md
+#     results/tuning/history_<experimento>.csv
+#     plots/cnn_tuning.png
+#
+# 14.07. Prueba con fotografías reales (pendiente)
+#
+#   No se dispone de fotografías reales de papel en el repositorio. La
+#   infraestructura está implementada y probada:
+#
+#     data/real_photos/manifest.csv  (columnas archivo, esperado, modelo,
+#                                     min_area, tipo, descripcion)
+#     python main.py real-test
+#
+#   Solo se procesan filas con tipo=foto_real. Las imágenes sintéticas de
+#   data/samples/ se rechazan y no se presentan como fotos reales. El informe
+#   results/REAL_PHOTOS.md indica honestamente el estado pendiente.
 #
 # ============================================================================
 
@@ -1685,6 +1830,31 @@
 #   --no-cv omite la validación cruzada.
 #   --models limita la evaluación a los modelos indicados.
 #
+# 20.04.b. tune-cnn
+#
+#   ..\.venv\Scripts\python.exe main.py tune-cnn
+#   ..\.venv\Scripts\python.exe main.py tune-cnn --epochs 3 --subset 10000
+#   ..\.venv\Scripts\python.exe main.py tune-cnn --experiments base lr_5e-4
+#
+#   Ejecuta experimentos reales de hiperparámetros de la CNN (learning rate,
+#   filtros, dropout y batch size) sobre un subconjunto estratificado de train
+#   y evalúa con validación. Nunca usa test. Genera results/cnn_tuning.csv,
+#   results/cnn_tuning.json, results/TUNING_CNN.md, plots/cnn_tuning.png y
+#   results/tuning/history_<experimento>.csv.
+#
+#   No sobrescribe models/cnn.keras ni results/metrics.csv.
+#
+# 20.04.c. real-test
+#
+#   ..\.venv\Scripts\python.exe main.py real-test
+#   ..\.venv\Scripts\python.exe main.py real-test --model cnn --min-area 60
+#   ..\.venv\Scripts\python.exe main.py real-test --manifest ruta\manifest.csv
+#
+#   Procesa solo fotografías reales registradas con tipo=foto_real. Si no hay
+#   fotos, informa del estado pendiente sin inventar resultados. Guarda
+#   results/real_photos_results.json, results/REAL_PHOTOS.md y las imágenes
+#   anotadas.
+#
 # 20.05. demo
 #
 #   ..\.venv\Scripts\python.exe main.py demo
@@ -1751,10 +1921,10 @@
 #
 # Resultado real:
 #
-#   Ran 31 tests in 5.490s
+#   Ran 41 tests in 4.913s
 #   OK
 #
-# 21.01. tests/test_models.py (5 pruebas)
+# 21.01. tests/test_models.py (7 pruebas)
 #
 #   - test_classic_models:
 #       construye Regresión Logística, KNN y SVM.
@@ -1763,6 +1933,10 @@
 #       parámetros y capas conv_1, pool_1, flatten, densa y salida.
 #   - test_mlp_architecture:
 #       verifica entrada (None, 784) y salida (None, 10).
+#   - test_cnn_custom_hyperparameters:
+#       la CNN acepta filtros, dropout y learning rate configurables.
+#   - test_cnn_rejects_invalid_hyperparameters:
+#       rechaza filtros cero, dropout 1.0 y learning rate negativo.
 #   - test_logistic_regression_learns_toy_data:
 #       ajusta con datos aleatorios y comprueba forma de predicción.
 #   - test_kmeans_fits:
@@ -1819,7 +1993,29 @@
 #   - test_full_image_fallback:
 #       prepara la imagen completa como un dígito.
 #
-# 21.05. Advertencias esperadas
+# 21.05. tests/test_tuning.py (4 pruebas)
+#
+#   - test_experiments_cover_all_factors:
+#       existen experimentos para learning rate, filtros, dropout y batch.
+#   - test_select_experiments:
+#       filtra experimentos por identificador.
+#   - test_unknown_experiment_raises:
+#       un identificador desconocido lanza ValueError.
+#   - test_training_subset_is_stratified:
+#       el subconjunto conserva las 10 clases.
+#
+# 21.06. tests/test_real_test.py (4 pruebas)
+#
+#   - test_workspace_creates_template:
+#       crea carpeta, instrucciones y plantilla de manifiesto.
+#   - test_empty_manifest_returns_pending_status:
+#       sin fotos, el estado es "sin_fotografias" y no inventa métricas.
+#   - test_synthetic_image_is_rejected:
+#       una fila con tipo=sintetica no se cuenta como foto real.
+#   - test_manifest_missing_columns_raises:
+#       un manifiesto incompleto lanza ValueError.
+#
+# 21.07. Advertencias esperadas
 #
 #   TensorFlow muestra mensajes de oneDNN y de ausencia de GPU en Windows.
 #   Son informativos, no fallos. No afectan al resultado de las pruebas.
@@ -1927,19 +2123,21 @@
 #
 # 23.02. Pruebas
 #
-#   31 pruebas aprobadas.
-#   Tiempo: 5.490 s.
+#   41 pruebas aprobadas.
+#   Tiempo: 4.913 s.
 #
 # 23.03. Aplicación
 #
-#   AppTest:
+#   AppTest (verificación final, con tuning ya generado):
 #     - 0 excepciones.
-#     - predicción correcta de "2026".
+#     - 5 pestañas.
+#     - predicción correcta de "2026" (verificación previa).
+#     - panel de tuning visible con la configuración dropout_bajo y 98.55 %.
 #
-#   Servidor:
-#     - HTTP 200 en el puerto de prueba 8503.
+#   Servidor (verificación final):
+#     - HTTP 200 en el puerto de prueba 8505.
 #     - página cargada.
-#     - sin errores de consola.
+#     - proceso detenido al terminar.
 #
 # 23.04. Gráficos verificados visualmente
 #
@@ -1952,19 +2150,25 @@
 # 23.05. Artefactos verificados
 #
 #   - results/RESUMEN.md.
-#   - results/metrics.csv.
+#   - results/metrics.csv (sin cambios: métricas originales de test).
 #   - results/cross_validation.csv.
 #   - results/kmeans_metrics.json.
 #   - results/demo_predictions.json.
+#   - results/cnn_tuning.csv, cnn_tuning.json y TUNING_CNN.md.
+#   - results/tuning/history_<experimento>.csv (9 archivos).
+#   - results/REAL_PHOTOS.md y real_photos_results.json (estado pendiente).
+#   - plots/cnn_tuning.png.
 #   - Los seis modelos en models/.
-#   - Los 28 gráficos en plots/.
+#   - Los 29 gráficos en plots/.
 #
 # 23.06. Estado de limpieza
 #
 #   - Servidor de prueba detenido.
-#   - Archivos temporales eliminados.
+#   - Archivos temporales eliminados (incluidos tuning_run.log y
+#     real_test_run.log, que además están en .gitignore).
 #   - Cachés __pycache__ eliminadas.
-#   - No hay procesos del proyecto escuchando en el puerto 8503.
+#   - No hay procesos del proyecto escuchando en los puertos de prueba.
+#   - Las fotografías personales del usuario quedan excluidas por .gitignore.
 #
 # ============================================================================
 
@@ -2008,9 +2212,21 @@
 #
 #   ..\.venv\Scripts\python.exe main.py evaluate
 #
+# 24.06.b. Ajuste de hiperparámetros de la CNN
+#
+#   ..\.venv\Scripts\python.exe main.py tune-cnn
+#
+#   No modifica los modelos ni las métricas de test.
+#
 # 24.07. Generar y probar la demo
 #
 #   ..\.venv\Scripts\python.exe main.py demo
+#
+# 24.07.b. Probar fotografías reales (opcional)
+#
+#   Añadir fotos a data/real_photos, completar manifest.csv con tipo=foto_real
+#   y ejecutar:
+#     ..\.venv\Scripts\python.exe main.py real-test
 #
 # 24.08. Ejecutar pruebas
 #
@@ -2063,7 +2279,7 @@
 #   config.py
 #   requirements.txt
 #   README.md
-#   DOCUMENTACION.env
+#   DOCUMENTACION.md
 #   .gitignore
 #   src/__init__.py
 #   src/dataset.py
@@ -2088,10 +2304,20 @@
 # 25.03. Resultados
 #
 #   results/RESUMEN.md
+#   results/INFORME_FINAL.md
 #   results/metrics.csv
 #   results/cross_validation.csv
 #   results/kmeans_metrics.json
 #   results/demo_predictions.json
+#
+#   results/cnn_tuning.csv
+#   results/cnn_tuning.json
+#   results/TUNING_CNN.md
+#   results/tuning/history_<experimento>.csv (9 archivos)
+#
+#   results/REAL_PHOTOS.md
+#   results/real_photos_results.json
+#   results/real_photos_anotadas/ (si hay fotos)
 #
 #   results/classification_cnn.csv
 #   results/classification_knn.csv
@@ -2115,7 +2341,7 @@
 #   results/training_mlp.json
 #   results/training_svm.json
 #
-# 25.04. Gráficos (28 archivos PNG)
+# 25.04. Gráficos (29 archivos PNG)
 #
 #   plots/dataset_overview.png
 #   plots/model_comparison.png
@@ -2140,6 +2366,8 @@
 #   plots/demo_annotated_numero_2026.png
 #   plots/demo_annotated_numero_31415.png
 #   plots/demo_annotated_numero_789.png
+#
+#   plots/cnn_tuning.png
 #
 # 25.05. Datos
 #
@@ -2233,6 +2461,21 @@
 #
 #   No se usan datos personales ni se envían imágenes a servicios externos.
 #   Todo el procesamiento es local.
+#
+# 26.12. Ajuste de hiperparámetros como cribado
+#
+#   Los 9 experimentos usan 20 000 imágenes y 5 épocas para ser viables en CPU.
+#   No son un entrenamiento final. Las diferencias pequeñas entre las mejores
+#   configuraciones pueden cambiar con otra inicialización o más épocas.
+#   La configuración seleccionada (dropout_bajo) queda como candidata y no se
+#   adoptó en producción para conservar los artefactos y métricas originales.
+#
+# 26.13. Fotografías reales no incluidas
+#
+#   No se dispone de fotografías reales en el repositorio. La infraestructura
+#   existe y está probada, pero la validación con papel real queda pendiente de
+#   que el usuario aporte sus fotos. No se presenta ninguna muestra sintética
+#   como fotografía real.
 #
 # ============================================================================
 
@@ -2331,7 +2574,7 @@
 # 28.01. Sin secretos
 #
 #   Este archivo no contiene contraseñas, tokens, claves API ni credenciales.
-#   No debe tratarse como un .env real.
+#   Es documentación Markdown, no un archivo de configuración ejecutable.
 #
 # 28.02. Procesamiento local
 #
@@ -2470,12 +2713,17 @@
 # [x] Visualización de máscara, recortes y anotación.
 # [x] Descarga de imagen anotada.
 # [x] README completo.
-# [x] DOCUMENTACION.env completo.
-# [x] 31 pruebas unitarias aprobadas.
+# [x] DOCUMENTACION.md completo.
+# [x] 41 pruebas unitarias aprobadas.
 # [x] AppTest sin excepciones.
 # [x] HTTP 200 verificado.
 # [x] Predicción correcta de 2026 verificada.
 # [x] Gráficos principales revisados visualmente.
+# [x] Ajuste de hiperparámetros de la CNN ejecutado (9 experimentos).
+# [x] Configuración seleccionada por validación: dropout_bajo (98.55 %).
+# [x] Test no utilizado en el ajuste de hiperparámetros.
+# [x] Infraestructura de prueba con fotografías reales implementada.
+# [ ] Fotografías reales de papel: pendiente de que el usuario las aporte.
 # [x] Archivos temporales eliminados.
 # [x] Servidor de prueba detenido.
 #
@@ -2487,16 +2735,19 @@
 # ============================================================================
 #
 # 2026-11-11
-#   - Creación de DOCUMENTACION.env.
+#   - Creación de DOCUMENTACION.md.
 #   - Recopilación del entorno exacto, estructura, decisiones, modelos,
 #     hiperparámetros, resultados, pruebas, verificación y limitaciones.
 #   - Inclusión de los resultados reales de test, validación cruzada, K-Means,
 #     CNN por clase y demostración end-to-end.
 #   - Inclusión de comandos de reproducción y solución de problemas.
+#   - Ajuste final: 9 experimentos reales de hiperparámetros de la CNN,
+#     selección por validación, prueba con fotografías reales, aclaración de
+#     fuentes y tipos de datos, unificación de DOCUMENTACION.md, 41 pruebas.
 #
 # ============================================================================
 #
-# FIN DE DOCUMENTACION.env
+# FIN DE DOCUMENTACION.md
 #
 # Este documento resume todo el trabajo realizado en el proyecto. Para detalles
 # adicionales, consultar README.md, results/RESUMEN.md y los archivos de

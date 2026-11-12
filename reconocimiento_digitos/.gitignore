@@ -15,8 +15,17 @@ results/streamlit_out.txt
 results/streamlit_err.txt
 results/train_log.txt
 results/train_redes_log.txt
+results/tuning_run.log
+results/real_test_run.log
 plots/_debug_*.png
 plots/_sanity_*.png
+
+# Fotografías personales del usuario (no se suben al repositorio)
+data/real_photos/*.jpg
+data/real_photos/*.jpeg
+data/real_photos/*.png
+data/real_photos/*.bmp
+data/real_photos/*.webp
 
 # Sistema operativo
 Thumbs.db

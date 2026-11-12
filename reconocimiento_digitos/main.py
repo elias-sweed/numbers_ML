@@ -5,7 +5,9 @@ Ejemplos:
     python main.py prepare
     python main.py train --model all
     python main.py evaluate
+    python main.py tune-cnn
     python main.py demo
+    python main.py real-test
     python main.py all
     python main.py predict --image ruta/a/foto.png --model cnn
     python main.py info
@@ -193,6 +195,46 @@ def command_demo(args: argparse.Namespace) -> None:
         ]
         print(pd.DataFrame(rows).to_string(index=False))
         print(f"\nResultados: {config.DEMO_RESULTS_FILE}")
+
+
+def command_tune_cnn(args: argparse.Namespace) -> None:
+    header("FASE 5 · Ajuste de hiperparámetros de la CNN")
+    from src.tuning import run_cnn_experiments
+
+    splits = load_dataset()
+    payload = run_cnn_experiments(
+        splits,
+        experiment_ids=args.experiments,
+        epochs=args.epochs,
+        subset_size=args.subset,
+        verbose=0 if args.quiet else 2,
+    )
+    print("\nConfiguración seleccionada por validación:")
+    print(f"  {payload['seleccionado']['id']}: {payload['seleccionado']['descripcion']}")
+    print(f"  Accuracy de validación: {payload['seleccionado']['best_val_accuracy'] * 100:.2f} %")
+    print(f"  val_loss: {payload['seleccionado']['val_loss_best_epoch']:.4f}")
+    print("\nEl conjunto de test no se utilizó en estos experimentos.")
+
+
+def command_real_test(args: argparse.Namespace) -> None:
+    header("FASE 11 · Prueba con fotografías reales")
+    from src.real_test import run_real_photo_test
+
+    result = run_real_photo_test(
+        manifest_path=Path(args.manifest) if args.manifest else None,
+        model_name=args.model,
+        min_area=args.min_area,
+    )
+    if result["estado"] == "sin_fotografias":
+        print(result["mensaje"])
+        print(f"\nPlantilla de manifiesto: {result['manifest']}")
+        print(f"Instrucciones: {result['instrucciones']}")
+    else:
+        print(f"Fotografías procesadas: {result['n_fotos']}")
+        if result.get("sequence_accuracy") is not None:
+            print(f"Secuencias correctas: {result['sequence_accuracy'] * 100:.2f} %")
+        print(f"Resultados: {result['json']}")
+        print(f"Informe: {result['markdown']}")
 
 
 def command_predict(args: argparse.Namespace) -> None:
@@ -438,6 +480,25 @@ def build_parser() -> argparse.ArgumentParser:
     demo = subparsers.add_parser("demo", help="Prueba el pipeline con imágenes demo")
     demo.add_argument("--model", default=None)
     demo.set_defaults(func=command_demo)
+
+    tune = subparsers.add_parser(
+        "tune-cnn",
+        help="Ejecuta experimentos reales de hiperparámetros de la CNN",
+    )
+    tune.add_argument("--experiments", nargs="+", default=None)
+    tune.add_argument("--epochs", type=int, default=5)
+    tune.add_argument("--subset", type=int, default=20_000)
+    tune.add_argument("--quiet", action="store_true")
+    tune.set_defaults(func=command_tune_cnn)
+
+    real_test = subparsers.add_parser(
+        "real-test",
+        help="Prueba el sistema con fotografías reales descritas en un manifiesto",
+    )
+    real_test.add_argument("--manifest", default=None)
+    real_test.add_argument("--model", default="cnn")
+    real_test.add_argument("--min-area", type=int, default=config.DEFAULT_MIN_AREA)
+    real_test.set_defaults(func=command_real_test)
 
     predict = subparsers.add_parser("predict", help="Predice una imagen propia")
     predict.add_argument("--image", required=True)

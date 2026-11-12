@@ -9,6 +9,10 @@ algoritmos y ofrece una interfaz web para probar imágenes propias.
 > Todas las métricas de este proyecto se obtienen ejecutando realmente el
 > código sobre el conjunto de test oficial de MNIST. El archivo
 > [`results/RESUMEN.md`](results/RESUMEN.md) se regenera con cada evaluación.
+> La documentación técnica completa está en
+> [`DOCUMENTACION.md`](DOCUMENTACION.md); no existe una segunda versión `.env`.
+> El informe final con experimentos, resultados y limitaciones está en
+> [`results/INFORME_FINAL.md`](results/INFORME_FINAL.md).
 
 ### Cumplimiento de las fases solicitadas
 
@@ -19,12 +23,14 @@ algoritmos y ofrece una interfaz web para probar imágenes propias.
 | 3. Preprocesamiento | `src/preprocessing.py`, `src/segmentation.py` |
 | 4. Algoritmos obligatorios | `src/models.py`, `src/training.py` |
 | 5. CNN (conv, pool, flatten, dense, ReLU, softmax, Adam) | `src/models.py::build_cnn` |
+| 5b. Ajuste de hiperparámetros con validación | `src/tuning.py`, `python main.py tune-cnn` |
 | 6. Evaluación y validación cruzada | `src/evaluation.py`, `python main.py evaluate` |
 | 7. Gráficos | `plots/` y `src/evaluation.py` |
 | 8. Software Streamlit | `app.py` |
 | 9. Estructura del proyecto | Sección 12 de este README |
-| 10. Comentarios y documentación | Código en español + este README |
+| 10. Comentarios y documentación | Código en español, `README.md` y `DOCUMENTACION.md` |
 | 11. Pruebas y verificación | `tests/`, `python -m unittest discover -s tests -v` |
+| 11b. Prueba con fotografías reales | `src/real_test.py`, `python main.py real-test` |
 
 ---
 
@@ -147,6 +153,28 @@ python main.py prepare
 
 La descarga se cachea en `~/.keras/datasets/mnist.npz`.
 
+### Fuente y tipos de datos
+
+MNIST es un **dataset público descargado de internet**, no una colección de
+fotografías tomadas para este proyecto:
+
+- **Fuente:** Yann LeCun, Corinna Cortes y Christopher Burges.
+- **Descarga usada:** `keras.datasets.mnist.load_data()`.
+- **URL del archivo:** `https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz`
+- **Referencia:** <http://yann.lecun.com/exdb/mnist/>
+
+El proyecto diferencia tres tipos de datos:
+
+| Tipo | Ubicación | Origen | Uso |
+|---|---|---|---|
+| MNIST original | `data/mnist_split.npz` | Dataset público | Entrenamiento, validación y test |
+| Muestras sintéticas | `data/samples/` | MNIST + rotación/ruido/desenfoque | Demo del pipeline |
+| Fotografías reales | `data/real_photos/` | Fotos del usuario | Prueba con papel real |
+
+Las muestras sintéticas **no se presentan como fotografías reales**. Las
+métricas de test solo usan MNIST. Los detalles están en
+[`data/FUENTES_Y_TIPOS_DE_DATOS.md`](data/FUENTES_Y_TIPOS_DE_DATOS.md).
+
 ---
 
 ## 5. Entrenamiento
@@ -185,6 +213,68 @@ Decisiones de viabilidad computacional:
 - **MLP y CNN**: usan el conjunto de validación con `EarlyStopping`,
   `ReduceLROnPlateau` y `ModelCheckpoint`.
 
+### 5.1. Ajuste de hiperparámetros de la CNN
+
+Se añadió un experimento comparativo real para la CNN:
+
+```bash
+python main.py tune-cnn
+```
+
+El protocolo:
+
+- subconjunto estratificado de **20 000** imágenes de entrenamiento;
+- **5 épocas** por experimento;
+- validación completa de **6 000** imágenes;
+- el conjunto de **test no se utiliza** para seleccionar hiperparámetros;
+- se varían learning rate, filtros, dropout y batch size, cambiando un factor
+  respecto a la configuración base en cada experimento.
+
+Resultados completos:
+
+- `results/cnn_tuning.csv`
+- `results/cnn_tuning.json`
+- `results/TUNING_CNN.md`
+- `plots/cnn_tuning.png`
+- historiales por experimento en `results/tuning/`
+
+#### Resultados reales de validación
+
+Ejecución del 11/11/2026: 20 000 imágenes de entrenamiento, 6 000 de
+validación, 5 épocas, semilla 42. Ordenados por accuracy de validación.
+
+| Experimento | Factor | LR | Filtros | Dropout | Batch | Mejor val accuracy | val_loss | Época |
+|---|---|---:|---|---:|---:|---:|---:|---:|
+| `dropout_bajo` | dropout | 1e-3 | 32/64 | 0.15/0.35 | 128 | **98.55 %** | **0.0558** | 5 |
+| `batch_64` | batch size | 1e-3 | 32/64 | 0.25/0.50 | 64 | 98.40 % | 0.0740 | 5 |
+| `lr_5e-4` | learning rate | 5e-4 | 32/64 | 0.25/0.50 | 128 | 98.30 % | 0.0601 | 5 |
+| `filtros_16_32` | filtros | 1e-3 | 16/32 | 0.25/0.50 | 128 | 98.18 % | 0.0639 | 5 |
+| `lr_2e-3` | learning rate | 2e-3 | 32/64 | 0.25/0.50 | 128 | 98.07 % | 0.0660 | 5 |
+| `dropout_alto` | dropout | 1e-3 | 32/64 | 0.35/0.60 | 128 | 97.83 % | 0.0837 | 4 |
+| `filtros_48_96` | filtros | 1e-3 | 48/96 | 0.25/0.50 | 128 | 97.63 % | 0.0892 | 5 |
+| `base` | base | 1e-3 | 32/64 | 0.25/0.50 | 128 | 97.60 % | 0.0869 | 5 |
+| `batch_256` | batch size | 1e-3 | 32/64 | 0.25/0.50 | 256 | 95.68 % | 0.2250 | 5 |
+
+**Configuración seleccionada:** `dropout_bajo` — filtros 32/64, dropout
+0.15/0.35, LR 1e-3 y batch 128. Obtuvo la mayor accuracy de validación
+(98.55 %) y el menor `val_loss` de la mejor época (0.0558), con +0.95 puntos
+sobre la base y el mismo coste de parámetros (468 010).
+
+**Justificación:** en este cribado de 5 épocas, una regularización más suave
+converge más rápido que la base; los lotes pequeños (64) también ayudan, pero
+con más coste por época. Reducir filtros a 16/32 mantiene un rendimiento alto
+con la mitad de parámetros, mientras que aumentar a 48/96 no compensa en 5
+épocas. Subir el batch a 256 empeora claramente la validación y endurecer el
+dropout (0.35/0.60) queda por debajo de la configuración elegida. La
+configuración elegida se registra como **candidata**; la CNN de
+producción conserva su entrenamiento original de 54 000 imágenes y 12 épocas
+con 99.61 % en test para no alterar artefactos ni métricas ya evaluadas.
+
+**Limitaciones:** es un cribado comparativo, no un entrenamiento final. Las
+diferencias entre las configuraciones más cercanas son pequeñas y pueden variar
+con la inicialización. Adoptar `dropout_bajo` exigiría reentrenar con las
+54 000 imágenes, reevaluar en test y actualizar `models/cnn.keras`.
+
 ---
 
 ## 6. Evaluación
@@ -218,6 +308,17 @@ Para omitir la validación cruzada:
 ```bash
 python main.py evaluate --no-cv
 ```
+
+### Validación y selección de modelos
+
+- **Modelos tradicionales:** validación cruzada estratificada de 3 folds sobre
+  un subconjunto de 6 000 imágenes de entrenamiento.
+- **MLP y CNN:** conjunto de validación de 6 000 imágenes para `EarlyStopping`,
+  `ReduceLROnPlateau` y selección de la mejor época.
+- **CNN, ajuste de hiperparámetros:** experimentos comparativos sobre el
+  subconjunto de entrenamiento y evaluación con validación. El test no se usa
+  para elegir configuración.
+- **Test:** se reserva para la evaluación final de los modelos ya entrenados.
 
 ### Cómo interpretar las métricas
 
@@ -301,6 +402,26 @@ no vio en entrenamiento.
 
 Resultados en `results/demo_predictions.json` y `plots/demo_predictions.png`.
 
+### 8.1. Prueba con fotografías reales
+
+El repositorio no incluye fotografías reales de papel. Para incorporarlas:
+
+1. Guarda una foto real en `data/real_photos/`.
+2. Añádela a `data/real_photos/manifest.csv` con `tipo=foto_real`.
+3. Ejecuta:
+
+```bash
+python main.py real-test
+```
+
+El comando procesa solo filas marcadas como `foto_real`, guarda
+`results/real_photos_results.json`, `results/REAL_PHOTOS.md` y las imágenes
+anotadas. Si no hay fotos, el informe indica que la prueba está pendiente y no
+inventa resultados. También puedes subir la foto directamente en la pestaña
+**Reconocer** de Streamlit.
+
+Instrucciones detalladas: [`data/real_photos/LEEME.md`](data/real_photos/LEEME.md).
+
 ---
 
 ## 9. Predicción desde la terminal
@@ -324,6 +445,13 @@ python main.py all
 Hace `prepare` → entrena los 6 modelos → evalúa → genera demostración y
 `results/RESUMEN.md`. Puede tardar varios minutos en CPU.
 
+Comandos específicos de las mejoras finales:
+
+```bash
+python main.py tune-cnn       # experimentos de hiperparámetros de la CNN
+python main.py real-test      # fotografías reales del manifiesto
+```
+
 ---
 
 ## 11. Pruebas automatizadas
@@ -337,8 +465,13 @@ Incluye pruebas de:
 - preprocesamiento (normalización, binarización, centrado, redimensionado);
 - segmentación (5 dígitos, imagen vacía, orden de izquierda a derecha);
 - arquitecturas CNN/MLP y modelos clásicos;
+- CNN configurable (filtros, dropout y learning rate, incluidos valores inválidos);
+- configuración de los 9 experimentos de hiperparámetros;
+- manifiesto de fotografías reales y rechazo de imágenes sintéticas;
 - pipeline de predicción con un modelo simulado;
 - formas y etiquetas del dataset preparado.
+
+Estado actual: **41 pruebas aprobadas**.
 
 ---
 
@@ -347,10 +480,11 @@ Incluye pruebas de:
 ```text
 reconocimiento_digitos/
 ├── app.py                 Interfaz Streamlit
-├── main.py                CLI: prepare / train / evaluate / demo / predict / info / all
+├── main.py                CLI: prepare / train / evaluate / tune-cnn / demo / real-test / predict / info / all
 ├── config.py              Rutas, semillas e hiperparámetros
 ├── requirements.txt
 ├── README.md
+├── DOCUMENTACION.md       Documentación técnica completa
 ├── src/
 │   ├── dataset.py         Descarga, división estratificada y metadatos
 │   ├── preprocessing.py   Grises, ruido, Otsu, 20×20 y centrado por masa
@@ -358,15 +492,18 @@ reconocimiento_digitos/
 │   ├── models.py          Los 6 modelos y sus arquitecturas
 │   ├── training.py        Entrenamiento, callbacks y persistencia
 │   ├── evaluation.py      Métricas, matrices, curvas y validación cruzada
+│   ├── tuning.py          Experimentos de hiperparámetros de la CNN
+│   ├── real_test.py       Prueba con fotografías reales
 │   ├── prediction.py      Inferencia sobre imágenes nuevas
 │   ├── demo.py            Generación de muestras y prueba end-to-end
 │   └── utils.py           Temporización, JSON y submuestreo
 ├── models/                Artefactos entrenados (.joblib / .keras)
-├── results/               Métricas, informes, historiales y resumen
+├── results/               Métricas, informes, historiales y resumen (incluye INFORME_FINAL.md)
 ├── plots/                 Todos los gráficos PNG
 ├── data/                  MNIST dividido, etiquetas y ejemplos
 │   ├── labels/
-│   └── samples/
+│   ├── samples/           Muestras sintéticas
+│   └── real_photos/       Fotografías reales del usuario
 └── tests/                 Pruebas unittest
 ```
 
@@ -435,6 +572,11 @@ Prueba end-to-end con 13 imágenes de demostración (dígitos del test + rotaci�
 y ruido): **13/13 secuencias correctas**. Son imágenes sintéticas y así se
 indica en la interfaz; no son fotografías reales.
 
+Fotografías reales de papel: **no se dispone de ellas en el repositorio**. La
+infraestructura de prueba está implementada en `src/real_test.py` y
+`data/real_photos/`; el resultado queda pendiente hasta que se añadan fotos
+reales. No se presentan las muestras sintéticas como fotos de papel.
+
 Puedes consultar:
 
 - `plots/model_comparison.png`
@@ -456,6 +598,12 @@ Puedes consultar:
   compararse con la de un clasificador.
 - Las imágenes de ejemplo son sintéticas (MNIST + rotación + ruido). Las fotos
   reales pueden requerir ajuste del área mínima o mejor iluminación.
+- No hay fotografías reales incluidas en el repositorio. La prueba con papel
+  real está pendiente y debe ejecutarse con `python main.py real-test` después
+  de añadir las fotos del usuario.
+- El ajuste de hiperparámetros de la CNN se hizo sobre 20 000 imágenes y 5
+  épocas por viabilidad en CPU; es un cribado comparativo, no el entrenamiento
+  final.
 - La confianza del SVM es softmax de márgenes, no una probabilidad calibrada.
 - Los dígitos que se tocan pueden segmentarse mal. Se incluye una heurística de
   separación por perfil de proyección, pero no resuelve todos los casos.

@@ -582,6 +582,31 @@ def render_evaluation() -> None:
     else:
         st.info("Entrena la MLP o la CNN para ver las curvas de precisión y pérdida.")
 
+    tuning_path = config.PLOTS_DIR / "cnn_tuning.png"
+    tuning_json = config.RESULTS_DIR / "cnn_tuning.json"
+    if tuning_path.exists() or tuning_json.exists():
+        st.divider()
+        st.markdown("#### Ajuste de hiperparámetros de la CNN")
+        st.markdown(
+            "Experimentos reales sobre un subconjunto estratificado del entrenamiento. "
+            "La configuración se eligió exclusivamente con el conjunto de validación; "
+            "el test no se usó para seleccionar hiperparámetros."
+        )
+        if tuning_path.exists():
+            st.image(str(tuning_path), width="stretch")
+        tuning = get_json(str(tuning_json))
+        if tuning:
+            selected = tuning.get("seleccionado", {})
+            if selected:
+                st.success(
+                    f"Configuración seleccionada: {selected.get('id', '—')} · "
+                    f"val accuracy {selected.get('best_val_accuracy', 0) * 100:.2f} % · "
+                    f"val_loss {selected.get('val_loss_best_epoch', 0):.4f}"
+                )
+            just = tuning.get("justificacion")
+            if just:
+                st.caption(just)
+
     st.divider()
     st.markdown("#### Validación cruzada de modelos tradicionales")
     if config.CV_RESULTS_FILE.exists():
@@ -796,7 +821,9 @@ def render_guide() -> None:
             "python main.py prepare\n"
             "python main.py train --model all\n"
             "python main.py evaluate\n"
+            "python main.py tune-cnn\n"
             "python main.py demo\n"
+            "python main.py real-test\n"
             "python main.py predict --image foto.png --model cnn\n"
             "python main.py info\n"
             "streamlit run app.py",
@@ -843,6 +870,10 @@ def render_guide() -> None:
 - Las imágenes de ejemplo del apartado "Usar ejemplo" son composiciones
   sintéticas de dígitos del test de MNIST con rotación y ruido; no son fotos
   reales y así se indica en la interfaz.
+- MNIST es un dataset público descargado de internet; no son fotos tomadas
+  para este proyecto.
+- Las fotografías reales de papel se incorporan en `data/real_photos/` y se
+  prueban con `python main.py real-test` o subiéndolas a esta app.
 - El reconocimiento está pensado para dígitos individuales o números en una
   línea. Los dígitos muy pegados pueden requerir ajuste manual o fallar.
 - La confianza del SVM es una transformación softmax de sus márgenes, no una

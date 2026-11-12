@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-11-11T23:56:17",
+  "estado": "sin_fotografias",
+  "tipo_datos": "fotografias_reales",
+  "manifest": "C:\\Users\\elias\\Documents\\SARA\\reconocimiento_digitos\\data\\real_photos\\manifest.csv",
+  "n_fotos": 0,
+  "n_con_esperado": 0,
+  "secuencias_correctas": 0,
+  "sequence_accuracy": null,
+  "digit_accuracy": null,
+  "resultados": [],
+  "omitidos": [],
+  "mensaje": "No hay fotografías reales registradas. Añade imágenes a data/real_photos y completa manifest.csv.",
+  "instrucciones": "Añade fotos reales a data/real_photos, completa manifest.csv con tipo=foto_real y ejecuta `python main.py real-test`.",
+  "json": "results\\real_photos_results.json",
+  "markdown": "results\\REAL_PHOTOS.md"
+}
