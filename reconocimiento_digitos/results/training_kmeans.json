@@ -1,0 +1,12 @@
+{
+  "modelo": "kmeans",
+  "nombre_legible": "K-Means (agrupamiento)",
+  "arquitectura": "K-Means (10 clústeres) sobre PCA(50)",
+  "n_entrenamiento": 20000,
+  "fecha": "2026-11-11T14:37:35",
+  "semilla": 42,
+  "tiempo_entrenamiento_s": 1.529,
+  "inercia": 599443.6875,
+  "archivo": "models\\kmeans.joblib",
+  "nota": "Modelo de agrupamiento: no usa etiquetas durante el ajuste. La asignación de dígitos se hace a posteriori solo para interpretar."
+}

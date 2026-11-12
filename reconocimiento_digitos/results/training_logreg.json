@@ -1,0 +1,12 @@
+{
+  "modelo": "logreg",
+  "nombre_legible": "Regresión Logística",
+  "arquitectura": "Regresión logística multinomial (lbfgs, C=1.0)",
+  "n_entrenamiento": 54000,
+  "fecha": "2026-11-11T14:36:52",
+  "semilla": 42,
+  "tiempo_entrenamiento_s": 7.923,
+  "exactitud_validacion": 0.9195,
+  "archivo": "models\\logistic_regression.joblib",
+  "nota": "Entrenado con el conjunto de entrenamiento completo."
+}

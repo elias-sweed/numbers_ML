@@ -1,0 +1,208 @@
+{
+  "model": "cnn",
+  "model_display": "Red Neuronal Convolucional (CNN)",
+  "note": "Imágenes sintéticas compuestas a partir del test de MNIST con rotación, ruido y desenfoque. No son fotografías reales.",
+  "sequence_accuracy": 1.0,
+  "results": [
+    {
+      "file": "digito_0.png",
+      "expected": "0",
+      "predicted": "0",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        0
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_1.png",
+      "expected": "1",
+      "predicted": "1",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        1
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_2.png",
+      "expected": "2",
+      "predicted": "2",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        2
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_3.png",
+      "expected": "3",
+      "predicted": "3",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        3
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_4.png",
+      "expected": "4",
+      "predicted": "4",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        4
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_5.png",
+      "expected": "5",
+      "predicted": "5",
+      "correct": true,
+      "confidence": 0.999961,
+      "digits": [
+        5
+      ],
+      "confidences": [
+        0.999961
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_6.png",
+      "expected": "6",
+      "predicted": "6",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        6
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_7.png",
+      "expected": "7",
+      "predicted": "7",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        7
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_8.png",
+      "expected": "8",
+      "predicted": "8",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        8
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "digito_9.png",
+      "expected": "9",
+      "predicted": "9",
+      "correct": true,
+      "confidence": 1.0,
+      "digits": [
+        9
+      ],
+      "confidences": [
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "numero_2026.png",
+      "expected": "2026",
+      "predicted": "2026",
+      "correct": true,
+      "confidence": 0.999943,
+      "digits": [
+        2,
+        0,
+        2,
+        6
+      ],
+      "confidences": [
+        0.999999,
+        0.999775,
+        1.0,
+        1.0
+      ],
+      "fallback": false
+    },
+    {
+      "file": "numero_31415.png",
+      "expected": "31415",
+      "predicted": "31415",
+      "correct": true,
+      "confidence": 0.99999,
+      "digits": [
+        3,
+        1,
+        4,
+        1,
+        5
+      ],
+      "confidences": [
+        1.0,
+        0.999971,
+        1.0,
+        1.0,
+        0.999981
+      ],
+      "fallback": false
+    },
+    {
+      "file": "numero_789.png",
+      "expected": "789",
+      "predicted": "789",
+      "correct": true,
+      "confidence": 0.99999,
+      "digits": [
+        7,
+        8,
+        9
+      ],
+      "confidences": [
+        1.0,
+        1.0,
+        0.999971
+      ],
+      "fallback": false
+    }
+  ]
+}

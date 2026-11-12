@@ -1,0 +1,80 @@
+[
+  {
+    "file": "digito_0.png",
+    "expected": "0",
+    "kind": "single",
+    "description": "Dígito 0 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_1.png",
+    "expected": "1",
+    "kind": "single",
+    "description": "Dígito 1 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_2.png",
+    "expected": "2",
+    "kind": "single",
+    "description": "Dígito 2 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_3.png",
+    "expected": "3",
+    "kind": "single",
+    "description": "Dígito 3 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_4.png",
+    "expected": "4",
+    "kind": "single",
+    "description": "Dígito 4 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_5.png",
+    "expected": "5",
+    "kind": "single",
+    "description": "Dígito 5 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_6.png",
+    "expected": "6",
+    "kind": "single",
+    "description": "Dígito 6 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_7.png",
+    "expected": "7",
+    "kind": "single",
+    "description": "Dígito 7 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_8.png",
+    "expected": "8",
+    "kind": "single",
+    "description": "Dígito 8 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "digito_9.png",
+    "expected": "9",
+    "kind": "single",
+    "description": "Dígito 9 (MNIST test + rotación/ruido)"
+  },
+  {
+    "file": "numero_2026.png",
+    "expected": "2026",
+    "kind": "multi",
+    "description": "Número 2026 (dígitos MNIST test compuestos)"
+  },
+  {
+    "file": "numero_31415.png",
+    "expected": "31415",
+    "kind": "multi",
+    "description": "Número 31415 (dígitos MNIST test compuestos)"
+  },
+  {
+    "file": "numero_789.png",
+    "expected": "789",
+    "kind": "multi",
+    "description": "Número 789 (dígitos MNIST test compuestos)"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "modelo": "mlp",
+  "nombre_legible": "Red Neuronal Artificial (MLP)",
+  "arquitectura": "MLP: Dense(256)-Dropout-Dense(128)-Dropout-Dense(10), ReLU + Softmax, Adam, sparse_categorical_crossentropy",
+  "n_entrenamiento": 54000,
+  "fecha": "2026-11-11T15:01:49",
+  "semilla": 42,
+  "tiempo_entrenamiento_s": 42.9,
+  "epocas_ejecutadas": 21,
+  "mejor_epoca": 17,
+  "mejor_val_accuracy": 0.9828333258628845,
+  "val_loss": 0.0723288357257843,
+  "exactitud_validacion": 0.9828333258628845,
+  "parametros_entrenables": 235146,
+  "archivo": "models\\mlp.keras",
+  "historial": "results\\history_mlp.csv",
+  "nota": "Validación usada para early stopping y selección del mejor modelo."
+}

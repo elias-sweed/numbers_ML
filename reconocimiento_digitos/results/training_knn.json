@@ -1,0 +1,12 @@
+{
+  "modelo": "knn",
+  "nombre_legible": "K-Nearest Neighbors (KNN)",
+  "arquitectura": "KNN (k=5, pesos=distancia) sobre PCA(50)",
+  "n_entrenamiento": 54000,
+  "fecha": "2026-11-11T14:36:54",
+  "semilla": 42,
+  "tiempo_entrenamiento_s": 0.629,
+  "exactitud_validacion": 0.976667,
+  "archivo": "models\\knn.joblib",
+  "nota": "Entrenado con el conjunto de entrenamiento completo."
+}

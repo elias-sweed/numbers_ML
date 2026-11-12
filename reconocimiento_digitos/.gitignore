@@ -1,0 +1,26 @@
+# Entorno virtual
+.venv/
+venv/
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Dataset descargado (se regenera con `python main.py prepare`)
+data/mnist_split.npz
+
+# Archivos temporales de la interfaz
+results/streamlit_out.txt
+results/streamlit_err.txt
+results/train_log.txt
+results/train_redes_log.txt
+plots/_debug_*.png
+plots/_sanity_*.png
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
+
+# Los modelos, métricas, gráficos y muestras SÍ se conservan: forman parte
+# de la entrega y permiten abrir la app sin reentrenar.

@@ -1,0 +1,21 @@
+# Sistema Inteligente de Reconocimiento de Dígitos Manuscritos
+# Python 3.12 es obligatorio: TensorFlow 2.21 no publica wheels para Python 3.14.
+#
+# Instalación:
+#   py -3.12 -m venv .venv
+#   .venv\Scripts\activate        (Windows)
+#   source .venv/bin/activate     (Linux/macOS)
+#   python -m pip install --upgrade pip
+#   python -m pip install -r requirements.txt
+
+tensorflow==2.21.0
+keras==3.15.1
+opencv-python==5.0.0.93
+numpy==2.5.4
+pandas==3.1.1
+matplotlib==3.11.2
+seaborn==0.13.2
+scikit-learn==1.9.1
+pillow==13.0.0
+streamlit==1.67.0
+joblib==1.6.0

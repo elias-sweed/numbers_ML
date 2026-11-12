@@ -1,0 +1,18 @@
+{
+  "modelo": "cnn",
+  "nombre_legible": "Red Neuronal Convolucional (CNN)",
+  "arquitectura": "CNN: Conv2D(32)-BN-Conv2D(32)-MaxPool-Dropout | Conv2D(64)-BN-Conv2D(64)-MaxPool-Dropout | Flatten-Dense(128)-Dropout-Dense(10)",
+  "n_entrenamiento": 54000,
+  "fecha": "2026-11-11T15:09:42",
+  "semilla": 42,
+  "tiempo_entrenamiento_s": 471.864,
+  "epocas_ejecutadas": 12,
+  "mejor_epoca": 12,
+  "mejor_val_accuracy": 0.9923333525657654,
+  "val_loss": 0.02886231057345867,
+  "exactitud_validacion": 0.9923333525657654,
+  "parametros_entrenables": 468010,
+  "archivo": "models\\cnn.keras",
+  "historial": "results\\history_cnn.csv",
+  "nota": "Validación usada para early stopping y selección del mejor modelo."
+}

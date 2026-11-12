@@ -1,0 +1,26 @@
+{
+  "modelo": "kmeans",
+  "nombre": "K-Means (agrupamiento)",
+  "tipo_evaluacion": "agrupamiento no supervisado",
+  "n_clusters": 10,
+  "adjusted_rand_index": 0.36573505373338905,
+  "normalized_mutual_info": 0.4978674302946518,
+  "silhouette": 0.08729181438684464,
+  "purity": 0.5931,
+  "exactitud_tras_mapeo": 0.5931,
+  "inercia": 599443.6875,
+  "tiempo_inferencia_s": 0.095,
+  "mapeo_cluster_a_digito": {
+    "0": 8,
+    "1": 1,
+    "2": 6,
+    "3": 1,
+    "4": 0,
+    "5": 4,
+    "6": 3,
+    "7": 7,
+    "8": 2,
+    "9": 0
+  },
+  "nota": "K-Means no usa etiquetas. ARI, NMI y silueta evalúan la calidad del agrupamiento. La pureza y la exactitud tras mapeo se calculan a posteriori solo para interpretar los clústeres."
+}

@@ -1,0 +1,12 @@
+{
+  "modelo": "svm",
+  "nombre_legible": "Máquina de Vectores de Soporte (SVM)",
+  "arquitectura": "SVM RBF (C=10, gamma=scale) sobre 784 píxeles; subconjunto estratificado",
+  "n_entrenamiento": 12000,
+  "fecha": "2026-11-11T14:37:33",
+  "semilla": 42,
+  "tiempo_entrenamiento_s": 17.006,
+  "exactitud_validacion": 0.970167,
+  "archivo": "models\\svm.joblib",
+  "nota": "Entrenado sobre un subconjunto estratificado por coste computacional."
+}

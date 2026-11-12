@@ -1,0 +1,90 @@
+{
+  "nombre": "MNIST (Modified National Institute of Standards and Technology)",
+  "descripcion": "Dígitos manuscritos en escala de grises, centrados y normalizados por el creador del dataset.",
+  "fuente": "TensorFlow/Keras: keras.datasets.mnist.load_data()",
+  "fecha_preparacion": "2026-11-11T14:24:25",
+  "dimensiones_imagen": [
+    28,
+    28
+  ],
+  "canales": 1,
+  "valores_pixel": [
+    0,
+    255
+  ],
+  "clases": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+  ],
+  "semilla": 42,
+  "estrategia_division": "División oficial train/test de MNIST (60 000/10 000) y separación estratificada del 10 % del train como validación (6 000). El test oficial permanece intacto.",
+  "conteos": {
+    "train": 54000,
+    "validation": 6000,
+    "test": 10000,
+    "total": 70000
+  },
+  "distribucion_train": {
+    "0": 5331,
+    "1": 6068,
+    "2": 5362,
+    "3": 5518,
+    "4": 5258,
+    "5": 4879,
+    "6": 5326,
+    "7": 5638,
+    "8": 5266,
+    "9": 5354
+  },
+  "distribucion_validation": {
+    "0": 592,
+    "1": 674,
+    "2": 596,
+    "3": 613,
+    "4": 584,
+    "5": 542,
+    "6": 592,
+    "7": 627,
+    "8": 585,
+    "9": 595
+  },
+  "distribucion_test": {
+    "0": 980,
+    "1": 1135,
+    "2": 1032,
+    "3": 1010,
+    "4": 982,
+    "5": 892,
+    "6": 958,
+    "7": 1028,
+    "8": 974,
+    "9": 1009
+  },
+  "formas": {
+    "X_train": [
+      54000,
+      28,
+      28
+    ],
+    "X_val": [
+      6000,
+      28,
+      28
+    ],
+    "X_test": [
+      10000,
+      28,
+      28
+    ]
+  },
+  "dtype": "uint8",
+  "nota": "Las métricas finales se calculan únicamente sobre X_test. La validación se usa para early stopping y ajuste de épocas."
+}

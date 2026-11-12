@@ -1,0 +1,12 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+
+# Opcional: descomenta si tus datasets o modelos pesan más de 50-100 MB
+# reconocimiento_digitos/data/
+# reconocimiento_digitos/models/

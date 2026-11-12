@@ -1,0 +1,21 @@
+Informe de clasificación · Máquina de Vectores de Soporte (SVM)
+Conjunto: test oficial de MNIST (10 000 imágenes)
+====================================================================
+              precision    recall  f1-score   support
+
+    Dígito 0     0.9748    0.9888    0.9818       980
+    Dígito 1     0.9860    0.9921    0.9890      1135
+    Dígito 2     0.9698    0.9632    0.9665      1032
+    Dígito 3     0.9553    0.9733    0.9642      1010
+    Dígito 4     0.9755    0.9715    0.9735       982
+    Dígito 5     0.9727    0.9585    0.9656       892
+    Dígito 6     0.9750    0.9770    0.9760       958
+    Dígito 7     0.9713    0.9562    0.9637      1028
+    Dígito 8     0.9651    0.9641    0.9646       974
+    Dígito 9     0.9603    0.9594    0.9598      1009
+
+    accuracy                         0.9707     10000
+   macro avg     0.9706    0.9704    0.9705     10000
+weighted avg     0.9707    0.9707    0.9707     10000
+
+Tiempo de inferencia: 27.306 s
