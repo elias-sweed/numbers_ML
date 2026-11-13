@@ -354,6 +354,22 @@ Desde la carpeta padre, si el `.venv` está en `SARA`:
 ..\.venv\Scripts\streamlit.exe run app.py
 ```
 
+### Despliegue en Streamlit Community Cloud
+
+El proyecto **necesita Python 3.12 o 3.13**. TensorFlow 2.21 no publica
+wheels para Python 3.14, así que el despliegue falla al instalar las
+dependencias si se elige esa versión.
+
+1. En <https://share.streamlit.io>, **elimina la app y vuelve a crearla**: la
+   versión de Python no se puede cambiar en una app ya desplegada.
+2. Usa el repositorio `elias-sweed/numbers_ML`, rama `main` y archivo
+   `reconocimiento_digitos/app.py`.
+3. En **Advanced settings**, selecciona **Python 3.12**.
+4. Despliega y espera a que termine la instalación.
+
+El repositorio incluye `packages.txt` en su raíz con las librerías del sistema
+que OpenCV necesita en Linux (`libgl1` y `libglib2.0-0`).
+
 ### Uso de la interfaz
 
 1. Elige el modelo en el selector (la CNN es la opción recomendada). El icono

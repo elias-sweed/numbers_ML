@@ -1,5 +1,6 @@
 # Sistema Inteligente de Reconocimiento de Dígitos Manuscritos
 # Python 3.12 es obligatorio: TensorFlow 2.21 no publica wheels para Python 3.14.
+# En Streamlit Community Cloud: Advanced settings -> Python 3.12.
 #
 # Instalación:
 #   py -3.12 -m venv .venv
