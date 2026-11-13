@@ -86,7 +86,7 @@
 #  11. Ejecuta 9 experimentos reales de hiperparámetros de la CNN, con
 #      selección exclusiva por validación.
 #  12. Incluye infraestructura para probar fotografías reales de papel.
-#  13. Incluye 43 pruebas unitarias, todas aprobadas.
+#  13. Incluye 49 pruebas unitarias, todas aprobadas.
 #
 # Resultado principal:
 #
@@ -174,7 +174,7 @@
 #
 # FASE 03 - Preprocesamiento
 #   Implementación: src/preprocessing.py y src/segmentation.py.
-#   Evidencia: 43 pruebas unitarias y pipeline end-to-end.
+#   Evidencia: 49 pruebas unitarias y pipeline end-to-end.
 #
 # FASE 04 - Algoritmos obligatorios
 #   Implementación: src/models.py y src/training.py.
@@ -206,7 +206,7 @@
 #
 # FASE 11 - Pruebas y verificación
 #   Implementación: tests/.
-#   Evidencia: 43 pruebas aprobadas en 5.766 segundos.
+#   Evidencia: 49 pruebas aprobadas.
 #
 # FASE 12 - Ajuste de hiperparámetros de la CNN
 #   Implementación: src/tuning.py y `python main.py tune-cnn`.
@@ -1676,6 +1676,7 @@
 # 19.03. Controles
 #
 #   - Selector único de modelo entrenado.
+#   - Icono de ayuda junto al título: explica qué hace cada modelo.
 #   - CNN como opción por defecto si está disponible.
 #   - Carga de imagen PNG, JPG, JPEG, BMP o WEBP.
 #   - Botón "Reconocer dígitos", deshabilitado hasta cargar una imagen.
@@ -1740,8 +1741,8 @@
 #   - AppTest ejecutado desde archivo: 0 excepciones.
 #   - Los cinco modelos se pueden seleccionar sin errores.
 #   - Predicción de "2026" verificada con los cinco modelos.
-#   - Prueba en navegador con una imagen sintética de dos dígitos:
-#     "42" reconocido con la CNN.
+#   - Prueba en navegador con data/samples/numero_2026.png:
+#     "2026" reconocido con la CNN (4 dígitos, 100 % de confianza).
 #   - Servidor HTTP: respuesta 200.
 #   - Navegador: página cargada sin errores de consola.
 #
@@ -2086,8 +2087,7 @@
 #
 # 23.02. Pruebas
 #
-#   43 pruebas aprobadas.
-#   Tiempo: 5.766 s.
+#   49 pruebas aprobadas.
 #
 # 23.03. Aplicación
 #
@@ -2095,11 +2095,14 @@
 #     - 0 excepciones.
 #     - Una sola pantalla con título, selector, carga y botón.
 #     - Los cinco modelos se seleccionan sin errores.
+#     - Guía visible con el tipo de imagen que se debe cargar.
+#     - Historial de pruebas visible y persistente.
 #     - Predicción correcta de "2026" (verificación previa).
-#     - Prueba en navegador: "42" reconocido en una imagen sintética.
+#     - Prueba en navegador: "2026" reconocido con 4 dígitos y 100 % de
+#       confianza; explicación detallada e historial guardado.
 #
 #   Servidor (verificación final):
-#     - HTTP 200 en el puerto de prueba 8506.
+#     - HTTP 200 en el puerto de prueba 8508.
 #     - página cargada sin errores de consola.
 #     - proceso detenido al terminar.
 #
@@ -2673,9 +2676,12 @@
 # [x] Carga de imágenes y reconocimiento con los cinco modelos.
 # [x] Visualización de máscara, recortes y anotación.
 # [x] Mensajes para imágenes sin trazo y baja confianza.
+# [x] Guía visible con el tipo de imagen que se debe cargar.
+# [x] Explicación detallada del resultado en lenguaje sencillo.
+# [x] Historial persistente de pruebas (100 registros, sin guardar imágenes).
 # [x] README completo.
 # [x] DOCUMENTACION.md completo.
-# [x] 43 pruebas unitarias aprobadas.
+# [x] 49 pruebas unitarias aprobadas.
 # [x] AppTest sin excepciones.
 # [x] HTTP 200 verificado.
 # [x] Predicción correcta de 2026 verificada.
@@ -2704,7 +2710,14 @@
 #   - Inclusión de comandos de reproducción y solución de problemas.
 #   - Ajuste final: 9 experimentos reales de hiperparámetros de la CNN,
 #     selección por validación, prueba con fotografías reales, aclaración de
-#     fuentes y tipos de datos, unificación de DOCUMENTACION.md, 43 pruebas.
+#     fuentes y tipos de datos, unificación de DOCUMENTACION.md, 49 pruebas.
+#
+# 2026-11-13
+#   - Interfaz simplificada de una sola pantalla.
+#   - Guía visible del tipo de imagen admitida.
+#   - Explicación detallada del resultado en lenguaje sencillo.
+#   - Historial persistente de las últimas 100 pruebas.
+#   - Corrección de la entrada aplanada del MLP y 49 pruebas aprobadas.
 #
 # ============================================================================
 #

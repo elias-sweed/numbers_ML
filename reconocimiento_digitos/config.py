@@ -108,6 +108,7 @@ KMEANS_METRICS_FILE = RESULTS_DIR / "kmeans_metrics.json"
 CV_RESULTS_FILE = RESULTS_DIR / "cross_validation.csv"
 DEMO_RESULTS_FILE = RESULTS_DIR / "demo_predictions.json"
 SUMMARY_FILE = RESULTS_DIR / "RESUMEN.md"
+HISTORY_FILE = RESULTS_DIR / "historial_reconocimiento.json"
 
 
 def ensure_directories() -> None:

@@ -26,8 +26,11 @@ Mejoras incorporadas en esta revisión:
 3. **Aclaración de fuentes y tipos de datos**: MNIST original, muestras
    sintéticas y fotografías reales.
 4. **Unificación documental** en `DOCUMENTACION.md` (sin `.env`).
-5. **Verificación** con 43 pruebas, AppTest y revisión de artefactos.
-6. **Informe final** (este archivo) con resultados, limitaciones y cumplimiento.
+5. **Interfaz simplificada de una sola pantalla**, con guía del tipo de imagen
+   admitida, explicación detallada del resultado en lenguaje sencillo e
+   historial persistente de las últimas 100 pruebas (sin guardar imágenes).
+6. **Verificación** con 49 pruebas, AppTest y revisión de artefactos.
+7. **Informe final** (este archivo) con resultados, limitaciones y cumplimiento.
 
 Los modelos y las métricas originales de test **no se sobrescribieron**.
 
@@ -203,12 +206,13 @@ Cómo completar la prueba:
 
 Ejecutado realmente:
 
-- **43 pruebas unitarias aprobadas** en 5.766 s:
+- **49 pruebas unitarias aprobadas:**
   `..\.venv\Scripts\python.exe -m unittest discover -s tests -v`
 - **AppTest:** 0 excepciones en la interfaz de una sola pantalla; los cinco
   modelos se seleccionan sin errores.
-- **Navegador:** imagen sintética de dos dígitos reconocida como "42" con la
-  CNN, sin errores de consola.
+- **Navegador:** `data/samples/numero_2026.png` reconocida como "2026" con la
+  CNN (4 dígitos, 100 % de confianza), con explicación detallada e historial
+  guardado, sin errores de consola.
 - **`python main.py real-test`:** estado `sin_fotografias`, sin resultados
   inventados.
 - **Tuning:** 9/9 experimentos completados con sus 9 historiales.
@@ -230,7 +234,7 @@ originales permanecen intactos.
 | 3. Prueba con imágenes reales | Parcial: infraestructura lista, faltan fotos | `src/real_test.py`, `manifest.csv`, informe pendiente |
 | 4. Origen y tipos de datos | Cumplido | §2 y `data/FUENTES_Y_TIPOS_DE_DATOS.md` |
 | 5. Documentación unificada | Cumplido | Solo `DOCUMENTACION.md`; referencias actualizadas |
-| 6. Verificación y reproducibilidad | Cumplido | 43 pruebas, AppTest, artefactos y semillas |
+| 6. Verificación y reproducibilidad | Cumplido | 49 pruebas, AppTest, artefactos y semillas |
 | 7. Informe final | Cumplido | Este archivo |
 
 ---

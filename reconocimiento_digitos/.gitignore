@@ -17,6 +17,8 @@ results/train_log.txt
 results/train_redes_log.txt
 results/tuning_run.log
 results/real_test_run.log
+results/historial_reconocimiento.json
+results/historial_reconocimiento.json.tmp
 plots/_debug_*.png
 plots/_sanity_*.png
 

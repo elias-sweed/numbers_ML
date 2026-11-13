@@ -356,14 +356,26 @@ Desde la carpeta padre, si el `.venv` está en `SARA`:
 
 ### Uso de la interfaz
 
-1. Elige el modelo en el selector (la CNN es la opción recomendada).
-2. Sube una imagen PNG/JPG/JPEG/BMP/WEBP con uno o varios dígitos.
+1. Elige el modelo en el selector (la CNN es la opción recomendada). El icono
+   **❓** explica en palabras sencillas qué hace cada modelo.
+2. Sube una imagen PNG/JPG/JPEG/BMP/WEBP con uno o varios dígitos. La propia
+   app indica qué tipo de imagen necesita: un número escrito a mano, en una
+   sola línea, con trazo oscuro sobre fondo claro, buena iluminación y la zona
+   del número recortada.
 3. Pulsa **Reconocer dígitos**.
 4. La app muestra:
    - número reconocido y confianza media;
+   - una explicación detallada en lenguaje sencillo de cómo se obtuvo el
+     resultado (preparación, separación de dígitos, clasificación y
+     confianza);
    - confianza por dígito;
    - imagen original e imagen procesada (máscara binarizada);
    - detección de cada dígito y recortes de 28×28 preparados para el modelo.
+5. Cada reconocimiento se guarda automáticamente en el **Historial de
+   pruebas** (hasta 100 registros, el más reciente primero). El historial se
+   guarda en `results/historial_reconocimiento.json` e incluye fecha, nombre
+   del archivo, modelo, número, confianza y número de dígitos. **No almacena
+   las imágenes**, solo sus datos y el resultado.
 
 La interfaz tiene una sola pantalla. No incluye evaluación, comparación,
 K-Means, ajuste de hiperparámetros ni guía técnica; esos recursos siguen
@@ -467,9 +479,12 @@ Incluye pruebas de:
 - configuración de los 9 experimentos de hiperparámetros;
 - manifiesto de fotografías reales y rechazo de imágenes sintéticas;
 - pipeline de predicción con un modelo simulado;
+- formas de entrada de las redes (MLP aplanada y CNN con canal);
+- historial de pruebas (orden, límite de 100, archivo dañado y escritura
+  atómica);
 - formas y etiquetas del dataset preparado.
 
-Estado actual: **43 pruebas aprobadas**.
+Estado actual: **49 pruebas aprobadas**.
 
 ---
 

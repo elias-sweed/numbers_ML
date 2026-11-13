@@ -23,7 +23,8 @@ import numpy as np
 import streamlit as st
 
 import config
-from src.prediction import available_models, predict_image
+from src.history import append_history, load_history
+from src.prediction import ImagePrediction, available_models, predict_image
 from src.preprocessing import to_uint8
 from src.training import load_trained_model
 
@@ -75,6 +76,97 @@ def bgr_to_rgb(image: np.ndarray) -> np.ndarray:
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
+def imagen_sin_trazo(resultado: ImagePrediction) -> bool:
+    """Indica si la imagen procesada no contiene suficientes píxeles de trazo."""
+    return float(np.mean(resultado.binary_image > 0)) < 0.001
+
+
+def explicar_resultado(resultado: ImagePrediction, modelo: str) -> str:
+    """Redacta una explicación sencilla del resultado y de su confianza."""
+    nombre_modelo = config.MODEL_DISPLAY_NAMES[modelo]
+    total = len(resultado.predictions)
+    confianza = resultado.mean_confidence * 100
+
+    if resultado.fallback:
+        deteccion = (
+            "2. **No se encontraron varios trazos separados.** Por eso se tomó "
+            "la imagen completa como si fuera **un solo dígito**. Para números "
+            "de varias cifras, deja un espacio claro entre los dígitos."
+        )
+    elif total == 1:
+        deteccion = (
+            "2. **Se separó el dígito.** Se encontró **1 dígito** y se preparó "
+            "para enviarlo al modelo."
+        )
+    else:
+        deteccion = (
+            f"2. **Se separaron los dígitos.** Se encontraron **{total} dígitos** "
+            "y se ordenaron de izquierda a derecha, como se lee un número."
+        )
+
+    if confianza >= 90:
+        nivel = "alta"
+        valoracion = (
+            "El modelo está muy seguro de su respuesta. Aun así, conviene "
+            "revisar el resultado si la letra es muy irregular."
+        )
+    elif confianza >= 70:
+        nivel = "media"
+        valoracion = (
+            "El modelo tiene una seguridad razonable, pero no total. Revisa la "
+            "imagen si el número esperado era distinto."
+        )
+    else:
+        nivel = "baja"
+        valoracion = (
+            "El modelo no está seguro. Revisa la nitidez, el contraste y que "
+            "los dígitos estén bien separados antes de confiar en el resultado."
+        )
+
+    partes = [
+        "#### ¿Cómo se obtuvo este resultado?",
+        (
+            "1. **Se preparó la imagen.** El sistema la convirtió a blanco y "
+            "negro, mejoró el contraste y separó el trazo del fondo."
+        ),
+        deteccion,
+        (
+            "3. **Se clasificó cada recorte.** Cada dígito se redujo a una "
+            "imagen pequeña de 28×28 píxeles y se envió al modelo "
+            f"**{nombre_modelo}**, que eligió la clase más probable entre 0 y 9."
+        ),
+        (
+            "4. **Se formó el número.** Al unir las respuestas en orden se "
+            f"obtuvo **{resultado.number}**. El sistema reconoce la secuencia "
+            "de dígitos; no interpreta su significado ni hace operaciones "
+            "matemáticas."
+        ),
+        (
+            f"**Confianza media: {confianza:.1f} % ({nivel}).** {valoracion} "
+            "La confianza indica qué tan seguro está el modelo de su propia "
+            "respuesta; no es una garantía de que el número sea correcto."
+        ),
+    ]
+    if modelo == "svm":
+        partes.append(
+            "En el caso del SVM, este valor es una estimación relativa, no una "
+            "probabilidad calibrada."
+        )
+    if total > 1:
+        peor = min(resultado.predictions, key=lambda item: item.confidence)
+        partes.append(
+            "El dígito con menor confianza está en la posición "
+            f"**{peor.index + 1}** (un **{peor.digit}**, "
+            f"{peor.confidence * 100:.1f} %). Si el número no coincide, revisa "
+            "primero ese dígito."
+        )
+    partes.append(
+        "El sistema trabaja con **una línea de dígitos**. Si los trazos se tocan "
+        "o la foto tiene sombras, la separación puede fallar."
+    )
+    return "\n\n".join(partes)
+
+
 # ---------------------------------------------------------------------------
 # Encabezado y descripción
 # ---------------------------------------------------------------------------
@@ -101,7 +193,34 @@ if not modelos_disponibles:
     )
     st.stop()
 
-st.subheader("1. Selecciona el modelo")
+col_titulo, col_ayuda = st.columns([0.9, 0.1], vertical_alignment="center")
+with col_titulo:
+    st.subheader("1. Selecciona el modelo")
+with col_ayuda:
+    with st.popover("❓", help="¿Qué hace cada modelo?"):
+        st.markdown(
+            """
+**Regresión Logística**  
+Traza una frontera lineal entre los dígitos. Es rápida y fácil de interpretar.
+
+**KNN (K-Nearest Neighbors)**  
+Compara la imagen con ejemplos ya conocidos y toma la opinión de los más parecidos.
+
+**SVM (Máquina de Vectores de Soporte)**  
+Busca la mejor frontera de separación entre clases. Suele ser preciso, aunque más lento.
+
+**MLP (Perceptrón Multicapa)**  
+Red neuronal de capas densas que aprende combinaciones de píxeles.
+
+**CNN (Red Neuronal Convolucional)**  
+Red especializada en imágenes: detecta trazos y formas. Es la recomendada para dígitos manuscritos.
+"""
+        )
+        st.caption(
+            "Los cinco modelos están entrenados con MNIST y se cargan desde "
+            "la carpeta models/."
+        )
+
 modelo = st.selectbox(
     "Modelo de reconocimiento",
     options=modelos_disponibles,
@@ -114,10 +233,19 @@ st.caption(
 )
 
 st.subheader("2. Carga la imagen")
+st.info(
+    "**Qué imagen debes cargar**\n\n"
+    "- Una foto o captura de **un número escrito a mano**, por ejemplo `405`.\n"
+    "- **Una sola línea** de dígitos, con espacio entre ellos.\n"
+    "- Trazo **oscuro sobre fondo claro**: papel blanco, tinta negra o azul.\n"
+    "- Buena iluminación, sin sombras fuertes, arrugas ni reflejos.\n"
+    "- Recorta la imagen para que el número ocupe la mayor parte.\n"
+    "- Formatos admitidos: **PNG, JPG, JPEG, BMP y WEBP**.\n"
+    "- No subas formularios completos, varias filas, letras ni dibujos."
+)
 archivo = st.file_uploader(
     "Imagen con uno o varios dígitos manuscritos",
     type=["png", "jpg", "jpeg", "bmp", "webp"],
-    help="Funciona mejor con trazos oscuros sobre fondo claro y buena iluminación.",
 )
 
 # Una imagen nueva o un modelo distinto invalidan el resultado anterior.
@@ -153,9 +281,36 @@ if reconocer and archivo is not None:
                 modelo_entrenado,
                 modelo,
             )
+        sin_trazo_resultado = imagen_sin_trazo(prediccion)
         st.session_state["resultado"] = prediccion
         st.session_state["resultado_modelo"] = modelo
         st.session_state["resultado_archivo"] = archivo.name
+        registro = {
+            "archivo": archivo.name,
+            "archivo_bytes": archivo.size,
+            "modelo": config.MODEL_DISPLAY_NAMES[modelo],
+            "modelo_id": modelo,
+            "numero": prediccion.number,
+            "confianza_media_pct": round(prediccion.mean_confidence * 100, 2),
+            "digitos": len(prediccion.predictions),
+            "fallback": bool(prediccion.fallback),
+            "sin_trazo": sin_trazo_resultado,
+            "detalle": [
+                {
+                    "posicion": item.index + 1,
+                    "digito": item.digit,
+                    "confianza_pct": round(item.confidence * 100, 2),
+                }
+                for item in prediccion.predictions
+            ],
+        }
+        try:
+            append_history(registro)
+        except OSError as exc:
+            st.warning(
+                "El resultado se muestra, pero no se pudo guardar en el "
+                f"historial. Detalle: {exc}"
+            )
     except Exception as exc:  # mensaje claro para el usuario
         st.session_state.pop("resultado", None)
         st.error(
@@ -180,7 +335,7 @@ elif not resultado_vigente:
 else:
     st.subheader("4. Resultado del reconocimiento")
 
-    sin_trazo = float(np.mean(resultado.binary_image > 0)) < 0.001
+    sin_trazo = imagen_sin_trazo(resultado)
 
     if sin_trazo:
         st.error(
@@ -216,6 +371,14 @@ else:
                 "contraste y que el número esté centrado en la imagen."
             )
 
+        with st.container(border=True):
+            st.markdown(explicar_resultado(resultado, modelo))
+
+        st.markdown("#### Confianza de cada dígito")
+        st.caption(
+            "Cuanto mayor sea el porcentaje, más segura es la respuesta para "
+            "ese dígito."
+        )
         tabla = [
             {
                 "Posición": item.index + 1,
@@ -260,6 +423,49 @@ else:
                     )
 
 st.divider()
+
+historial = load_history()
+with st.expander(f"Historial de pruebas ({len(historial)})"):
+    if not historial:
+        st.caption(
+            "Todavía no hay pruebas guardadas. Cada reconocimiento se añadirá "
+            "aquí automáticamente."
+        )
+    else:
+        filas_historial = []
+        for entrada in historial:
+            sin_trazo_entrada = bool(entrada.get("sin_trazo"))
+            confianza_entrada = entrada.get("confianza_media_pct")
+            if sin_trazo_entrada:
+                numero = "—"
+                confianza_texto = "—"
+                estado = "Sin trazo"
+            else:
+                numero = str(entrada.get("numero") or "—")
+                confianza_texto = (
+                    f"{float(confianza_entrada):.1f}"
+                    if isinstance(confianza_entrada, (int, float))
+                    else "—"
+                )
+                estado = "Procesado"
+            filas_historial.append(
+                {
+                    "Fecha": entrada.get("fecha", ""),
+                    "Imagen": entrada.get("archivo", ""),
+                    "Modelo": entrada.get("modelo", ""),
+                    "Número": numero,
+                    "Confianza media (%)": confianza_texto,
+                    "Dígitos": entrada.get("digitos", 0),
+                    "Estado": estado,
+                }
+            )
+        st.dataframe(filas_historial, width="stretch", hide_index=True)
+        ruta_historial = config.HISTORY_FILE.relative_to(config.BASE_DIR).as_posix()
+        st.caption(
+            f"Se guardan hasta 100 pruebas en `{ruta_historial}`. "
+            "La imagen no se almacena; solo su nombre y el resultado."
+        )
+
 st.caption(
     "Proyecto académico de Machine Learning y visión por computadora. "
     "Las predicciones proceden de modelos entrenados con el dataset público "
