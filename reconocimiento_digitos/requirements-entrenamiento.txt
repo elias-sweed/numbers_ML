@@ -1,0 +1,7 @@
+# Dependencias para ENTRENAR los modelos (incluye TensorFlow).
+# Requiere Python 3.12 o 3.13: TensorFlow 2.21 no publica wheels para 3.14.
+#
+#   python -m pip install -r requirements-entrenamiento.txt
+
+-r requirements.txt
+tensorflow==2.21.0

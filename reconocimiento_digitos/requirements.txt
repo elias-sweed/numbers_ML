@@ -1,16 +1,20 @@
 # Sistema Inteligente de Reconocimiento de Dígitos Manuscritos
-# Python 3.12 es obligatorio: TensorFlow 2.21 no publica wheels para Python 3.14.
-# En Streamlit Community Cloud: Advanced settings -> Python 3.12.
+# Dependencias para EJECUTAR la app (inferencia) en Python 3.12, 3.13 o 3.14.
+# Keras usa el backend JAX, así que la app no necesita TensorFlow.
 #
-# Instalación:
+# Para entrenar o volver a entrenar los modelos hace falta TensorFlow:
+#   python -m pip install -r requirements-entrenamiento.txt
+#
+# Instalación de la app:
 #   py -3.12 -m venv .venv
 #   .venv\Scripts\activate        (Windows)
 #   source .venv/bin/activate     (Linux/macOS)
 #   python -m pip install --upgrade pip
 #   python -m pip install -r requirements.txt
 
-tensorflow==2.21.0
 keras==3.15.1
+jax==0.9.2
+jaxlib==0.9.2
 opencv-python==5.0.0.93
 numpy==2.5.4
 pandas==3.1.1

@@ -16,6 +16,13 @@ el modelo entrenado los clasifica. No se simulan predicciones.
 
 from __future__ import annotations
 
+import os
+
+# Keras puede ejecutar los modelos con el backend JAX. Así la app funciona en
+# Python 3.12, 3.13 y 3.14 sin instalar TensorFlow (que no tiene wheels para
+# Python 3.14). El entrenamiento sigue usando TensorFlow.
+os.environ.setdefault("KERAS_BACKEND", "jax")
+
 from typing import Any
 
 import cv2

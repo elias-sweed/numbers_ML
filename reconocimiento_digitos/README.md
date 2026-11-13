@@ -62,8 +62,9 @@ algoritmos y ofrece una interfaz web para probar imágenes propias.
 
 ## 2. Herramientas utilizadas
 
-- **Python 3.12**
-- **TensorFlow 2.21 / Keras 3.15** — MLP y CNN
+- **Python 3.12** para entrenar (la app también funciona en 3.13 y 3.14)
+- **TensorFlow 2.21 / Keras 3.15** — entrenamiento de MLP y CNN
+- **JAX 0.9 / Keras 3.15** — inferencia de MLP y CNN en la app
 - **scikit-learn 1.9** — Regresión Logística, KNN, SVM, K-Means, métricas y
   validación cruzada
 - **OpenCV 5.0** — preprocesamiento, umbralización, contornos y segmentación
@@ -73,9 +74,10 @@ algoritmos y ofrece una interfaz web para probar imágenes propias.
 - **Streamlit 1.67** — interfaz web
 - **Joblib** — persistencia de modelos clásicos
 
-> **Nota sobre Python:** TensorFlow 2.21 no publica wheels para Python 3.14.
-> Por eso el proyecto usa Python 3.12. Si en el equipo solo hay 3.14, instala
-> 3.12 antes de crear el entorno virtual.
+> **Nota sobre Python:** TensorFlow 2.21 no publica wheels para Python 3.14,
+> así que **el entrenamiento** requiere Python 3.12 o 3.13. La app no usa
+> TensorFlow: carga los modelos `.keras` con Keras y el backend JAX, por lo que
+> también funciona en Python 3.14.
 
 ---
 

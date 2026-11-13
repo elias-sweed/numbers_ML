@@ -64,7 +64,9 @@ def load_trained_model(name: str) -> Any:
             f"Ejecuta: python main.py train --model {name}"
         )
     if name in {"mlp", "cnn"}:
-        from tensorflow import keras
+        # `keras` usa el backend indicado por KERAS_BACKEND (JAX en la app) o
+        # TensorFlow por defecto. El formato .keras es independiente del backend.
+        import keras
 
         return keras.models.load_model(path, compile=False)
     return joblib.load(path)
