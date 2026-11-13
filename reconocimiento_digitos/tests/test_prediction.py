@@ -33,6 +33,19 @@ class _DummyModel:
         return np.argmax(self.predict_proba(X), axis=1)
 
 
+class _DummyKerasModel:
+    """Modelo Keras mínimo para comprobar las formas de entrada."""
+
+    def __init__(self):
+        self.seen_shape = None
+
+    def predict(self, X, verbose=0):
+        self.seen_shape = X.shape
+        probs = np.full((len(X), 10), 0.01, dtype=np.float32)
+        probs[:, 7] = 0.91
+        return probs / probs.sum(axis=1, keepdims=True)
+
+
 def _canvas_with_text(text: str, width: int = 500) -> np.ndarray:
     canvas = np.full((170, width, 3), 255, dtype=np.uint8)
     cv2.putText(
@@ -101,6 +114,21 @@ class TestPrediction(unittest.TestCase):
         probs = predict_probabilities(_DummyModel(), "logreg", [np.zeros((28, 28), np.float32)])
         self.assertEqual(probs.shape, (1, 10))
         self.assertAlmostEqual(float(probs.sum()), 1.0, places=5)
+
+    def test_keras_mlp_uses_flattened_input(self):
+        """La MLP debe recibir (N, 784), no la imagen 28x28x1 de la CNN."""
+        model = _DummyKerasModel()
+        probs = predict_probabilities(model, "mlp", [np.zeros((28, 28), np.float32)])
+        self.assertEqual(model.seen_shape, (1, 784))
+        self.assertEqual(probs.shape, (1, 10))
+        self.assertAlmostEqual(float(probs.sum()), 1.0, places=5)
+
+    def test_keras_cnn_uses_image_input(self):
+        """La CNN debe recibir (N, 28, 28, 1)."""
+        model = _DummyKerasModel()
+        probs = predict_probabilities(model, "cnn", [np.zeros((28, 28), np.float32)])
+        self.assertEqual(model.seen_shape, (1, 28, 28, 1))
+        self.assertEqual(probs.shape, (1, 10))
 
 
 if __name__ == "__main__":

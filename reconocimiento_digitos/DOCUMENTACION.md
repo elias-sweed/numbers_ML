@@ -81,12 +81,12 @@
 #   6. Evalúa con accuracy, precision, recall, F1 y matriz de confusión.
 #   7. Aplica validación cruzada a los modelos tradicionales.
 #   8. Genera gráficos, informes y un resumen en Markdown.
-#   9. Ofrece una interfaz Streamlit moderna con cinco pestañas.
+#   9. Ofrece una interfaz Streamlit de una sola pantalla para reconocer dígitos.
 #  10. Incluye una demostración end-to-end con imágenes sintéticas.
 #  11. Ejecuta 9 experimentos reales de hiperparámetros de la CNN, con
 #      selección exclusiva por validación.
 #  12. Incluye infraestructura para probar fotografías reales de papel.
-#  13. Incluye 41 pruebas unitarias, todas aprobadas.
+#  13. Incluye 43 pruebas unitarias, todas aprobadas.
 #
 # Resultado principal:
 #
@@ -103,7 +103,7 @@
 #   - Responde HTTP 200.
 #   - AppTest no reporta excepciones.
 #   - Reconoce correctamente la secuencia 2026 en la prueba automatizada.
-#   - Las pestañas de evaluación, comparación, K-Means y guía funcionan.
+#   - La interfaz se limita al reconocimiento: modelo, imagen y resultado.
 #
 # ============================================================================
 
@@ -141,10 +141,11 @@
 #   - Soporte para fondo claro con trazo oscuro y fondo oscuro con trazo claro.
 #   - Soporte para PNG con transparencia y orientación EXIF.
 #   - Selección del modelo desde la interfaz.
-#   - Ajuste del área mínima y del máximo de dígitos.
+#   - Segmentación automática con parámetros por defecto.
 #   - Visualización de la máscara, los recortes 28x28 y la imagen anotada.
 #   - Descarga de la imagen anotada.
-#   - Consulta de métricas, matrices, curvas, comparación y K-Means.
+#   - Consulta de métricas, matrices, curvas, comparación y K-Means fuera de
+#     la interfaz (CLI y archivos de results/).
 #
 # FUERA DEL ALCANCE
 #
@@ -173,7 +174,7 @@
 #
 # FASE 03 - Preprocesamiento
 #   Implementación: src/preprocessing.py y src/segmentation.py.
-#   Evidencia: 41 pruebas unitarias y pipeline end-to-end.
+#   Evidencia: 43 pruebas unitarias y pipeline end-to-end.
 #
 # FASE 04 - Algoritmos obligatorios
 #   Implementación: src/models.py y src/training.py.
@@ -205,7 +206,7 @@
 #
 # FASE 11 - Pruebas y verificación
 #   Implementación: tests/.
-#   Evidencia: 41 pruebas aprobadas en 4.913 segundos.
+#   Evidencia: 43 pruebas aprobadas en 5.766 segundos.
 #
 # FASE 12 - Ajuste de hiperparámetros de la CNN
 #   Implementación: src/tuning.py y `python main.py tune-cnn`.
@@ -394,8 +395,7 @@
 # reconocimiento_digitos/
 # |
 # +-- app.py
-# |     Interfaz Streamlit con cinco pestañas: Reconocer, Evaluación,
-# |     Comparación, K-Means y Guía.
+# |     Interfaz Streamlit de una sola pantalla: modelo, imagen y resultado.
 # |
 # +-- main.py
 # |     Punto de entrada CLI. Comandos: prepare, train, evaluate, tune-cnn,
@@ -610,17 +610,19 @@
 #
 # 07.04. Flujo de la aplicación Streamlit
 #
-#   Barra lateral: modelo, área mínima, máximo de dígitos
+#   Selector de modelo
 #        |
 #        v
-#   Pestaña Reconocer
-#        |
-#        +--> Subir imagen o usar ejemplo
+#   Carga de imagen
 #        |
 #        v
-#   Segmentación + predicción + visualización
+#   Botón Reconocer dígitos
 #        |
-#        +--> Pestañas de evaluación, comparación, K-Means y guía
+#        v
+#   Segmentación + preprocesamiento + predicción
+#        |
+#        v
+#   Número reconocido + confianza + imágenes de apoyo
 #
 # ============================================================================
 
@@ -930,8 +932,9 @@
 #
 # 10.10. Límites
 #
-#   - Máximo de dígitos configurable, por defecto 15.
-#   - Área mínima configurable, por defecto 40 px².
+#   - Máximo de dígitos configurable en config.py, por defecto 15.
+#   - Área mínima configurable en config.py, por defecto 40 px².
+#   - La interfaz usa estos valores automáticamente, sin sliders.
 #   - Los dígitos que se tocan pueden seguir fallando.
 #
 # ============================================================================
@@ -1656,111 +1659,70 @@
 #
 # 19.01. Configuración de página
 #
-#   Título......: Reconocimiento de Dígitos · ML & DL
+#   Título......: Sistema de Reconocimiento de Dígitos Manuscritos
 #   Icono.......: 🔢
-#   Layout......: wide
-#   Sidebar.....: expandida
+#   Layout......: centered
+#   Sidebar.....: sin barra lateral
 #
 # 19.02. Diseño visual
 #
-#   - Fondo con degradado claro.
-#   - Tipografía Segoe UI / Inter / system-ui.
-#   - Hero con degradado azul y verde.
-#   - Tarjetas de métricas con bordes redondeados y sombra suave.
-#   - Tarjeta de resultado con número grande y confianza.
-#   - Filas de dígitos con chip, barra de confianza y porcentaje.
-#   - Pestañas con estilo propio.
-#   - Colores de confianza:
-#       >= 90 %: verde.
-#       70-90 %: ámbar.
-#       < 70 %: rojo.
+#   - Página centrada y de una sola pantalla.
+#   - Título azul y descripción breve del objetivo.
+#   - Tarjeta de resultado con el número reconocido en grande.
+#   - Tabla de confianza por dígito.
+#   - Imagen original, imagen procesada y detección anotada.
+#   - Recortes de 28x28 en un desplegable.
 #
-# 19.03. Barra lateral
+# 19.03. Controles
 #
-#   - Selector de modelo entrenado.
+#   - Selector único de modelo entrenado.
 #   - CNN como opción por defecto si está disponible.
-#   - Slider de área mínima: 10 a 400 px², paso 10, por defecto 40.
-#   - Slider de máximo de dígitos: 1 a 15, por defecto 15.
-#   - Métricas del modelo seleccionado: accuracy y F1 macro.
-#   - Información del dataset.
-#   - Nota de honestidad académica.
+#   - Carga de imagen PNG, JPG, JPEG, BMP o WEBP.
+#   - Botón "Reconocer dígitos", deshabilitado hasta cargar una imagen.
+#   - Sin sliders ni ajustes manuales: se usan config.DEFAULT_MIN_AREA (40)
+#     y config.DEFAULT_MAX_DIGITS (15).
 #
-# 19.04. Pestaña Reconocer
+# 19.04. Flujo de reconocimiento
 #
-#   Fuentes:
-#     - Subir imagen PNG, JPG, JPEG, BMP o WEBP.
-#     - Usar ejemplo del manifiesto de data/samples/.
+#   1. Cargar la imagen.
+#   2. Convertir a escala de grises y normalizar.
+#   3. Segmentar los dígitos con OpenCV.
+#   4. Preparar cada recorte a 28x28.
+#   5. Predecir con el modelo elegido.
+#   6. Mostrar el número y la confianza.
 #
-#   Al procesar:
-#     - Carga el modelo con caché de Streamlit.
-#     - Segmenta y predice.
-#     - Muestra el número reconocido y la confianza media.
-#     - Indica si coincide con el valor esperado del ejemplo.
-#     - Avisa si se usó fallback.
-#     - Muestra confianza por dígito con barras.
-#     - Permite ver probabilidades por clase del primer dígito.
-#     - Permite descargar la imagen anotada en PNG.
+#   El resultado solo se calcula al pulsar el botón. Cambiar la imagen o el
+#   modelo invalida el resultado anterior. No se simulan predicciones.
 #
-#   Visualizaciones:
-#     - Imagen original.
-#     - Umbralización de Otsu.
-#     - Segmentación y predicción.
-#     - Recortes 28x28 preparados para el modelo.
-#     - Ejemplos de test si aún no hay imagen.
+# 19.05. Resultado
 #
-#   Interpretación de confianza:
-#     - >= 90 %: predicción muy segura.
-#     - 70-90 %: predicción probable.
-#     - < 70 %: el modelo duda; revisar ruido, trazo o segmentación.
-#     - SVM: confianza relativa, no probabilidad calibrada.
+#   - Número reconocido y confianza media.
+#   - Tabla con posición, dígito y confianza.
+#   - Imagen original e imagen procesada.
+#   - Imagen con la detección de cada dígito.
+#   - Recortes de 28x28 preparados para el modelo.
 #
-# 19.05. Pestaña Evaluación
+# 19.06. Mensajes de error y avisos
 #
-#   - Tarjetas: mejor modelo, modelos evaluados, mejor F1, imágenes de test.
-#   - Tabla de métricas ordenada por accuracy.
-#   - Selector de modelo para inspeccionar.
-#   - Matriz de confusión.
-#   - Métricas por clase.
-#   - Informe completo en texto.
-#   - Curvas de entrenamiento de CNN y MLP.
-#   - Tabla de validación cruzada.
-#   - Ejemplos reales de test con predicción.
+#   - Imagen vacía o sin trazo: mensaje de error.
+#   - Fallback a imagen completa: aviso para separar los dígitos.
+#   - Confianza media inferior al 50 %: aviso de revisión.
+#   - Error de lectura o de modelo: mensaje con el detalle.
 #
-# 19.06. Pestaña Comparación
+# 19.07. Secciones retiradas de la interfaz
 #
-#   - Gráfico comparativo de los cinco clasificadores.
-#   - Tabla de accuracy, precision, recall y F1.
-#   - Explicaciones desplegables de cada algoritmo:
-#       Regresión Logística, KNN, SVM, MLP, CNN y K-Means.
-#   - Nota metodológica: K-Means no se mezcla con clasificadores.
+#   - Evaluación, comparación y K-Means.
+#   - Guía técnica extensa y paneles de experimentos.
+#   - Ajuste de hiperparámetros y sliders de segmentación.
 #
-# 19.07. Pestaña K-Means
+#   El código, los modelos, los resultados y los comandos de la CLI se
+#   conservan para los requisitos académicos.
 #
-#   - Tarjetas de ARI, NMI, silueta y pureza.
-#   - Exactitud tras mapeo e inercia.
-#   - Centroides reconstruidos.
-#   - Tamaño de clústeres.
-#   - Proyección PCA 2D: clústeres frente a etiquetas reales.
-#   - Matriz de confusión del mapeo.
-#   - Tabla del mapeo clúster -> dígito mayoritario.
-#   - Explicación de clústeres duplicados por estilo.
+# 19.08. Caché
 #
-# 19.08. Pestaña Guía
+#   @st.cache_resource para los modelos entrenados.
 #
-#   - Flujo de la aplicación.
-#   - Comandos útiles.
-#   - Información del dataset.
-#   - Recomendaciones para fotos reales.
-#   - Limitaciones declaradas.
-#   - Estructura del proyecto.
-#
-# 19.09. Caché
-#
-#   @st.cache_resource para modelos.
-#   @st.cache_data para métricas, JSON, manifiesto y textos.
-#   Esto evita recargar modelos y archivos en cada interacción.
-#
-# 19.10. Ejecución
+# 19.09. Ejecución
 #
 #   Opción principal:
 #
@@ -1773,14 +1735,15 @@
 #
 #   URL por defecto: http://localhost:8501
 #
-# 19.11. Verificación de la app
+# 19.10. Verificación de la app
 #
 #   - AppTest ejecutado desde archivo: 0 excepciones.
-#   - Selección de numero_2026.png: predicción correcta "2026".
+#   - Los cinco modelos se pueden seleccionar sin errores.
+#   - Predicción de "2026" verificada con los cinco modelos.
+#   - Prueba en navegador con una imagen sintética de dos dígitos:
+#     "42" reconocido con la CNN.
 #   - Servidor HTTP: respuesta 200.
 #   - Navegador: página cargada sin errores de consola.
-#   - Captura visual no disponible por visibilidad del escritorio; se verificó
-#     mediante snapshot de accesibilidad y consola.
 #
 # ============================================================================
 
@@ -2123,20 +2086,21 @@
 #
 # 23.02. Pruebas
 #
-#   41 pruebas aprobadas.
-#   Tiempo: 4.913 s.
+#   43 pruebas aprobadas.
+#   Tiempo: 5.766 s.
 #
 # 23.03. Aplicación
 #
-#   AppTest (verificación final, con tuning ya generado):
+#   AppTest (verificación final):
 #     - 0 excepciones.
-#     - 5 pestañas.
-#     - predicción correcta de "2026" (verificación previa).
-#     - panel de tuning visible con la configuración dropout_bajo y 98.55 %.
+#     - Una sola pantalla con título, selector, carga y botón.
+#     - Los cinco modelos se seleccionan sin errores.
+#     - Predicción correcta de "2026" (verificación previa).
+#     - Prueba en navegador: "42" reconocido en una imagen sintética.
 #
 #   Servidor (verificación final):
-#     - HTTP 200 en el puerto de prueba 8505.
-#     - página cargada.
+#     - HTTP 200 en el puerto de prueba 8506.
+#     - página cargada sin errores de consola.
 #     - proceso detenido al terminar.
 #
 # 23.04. Gráficos verificados visualmente
@@ -2431,7 +2395,7 @@
 #
 #   Las 13 imágenes de demostración son composiciones de MNIST con rotación,
 #   ruido y desenfoque. No son fotos reales. Las fotos reales pueden requerir
-#   ajuste del área mínima, mejor iluminación o recorte.
+#   mejor iluminación o un recorte más ajustado.
 #
 # 26.06. Confianza del SVM
 #
@@ -2514,15 +2478,13 @@
 # 27.06. No detecta dígitos
 #
 #   Solución:
-#     - bajar el área mínima;
 #     - usar fondo claro y trazo oscuro;
 #     - recortar la zona del número;
-#     - mejorar la iluminación.
+#     - mejorar la iluminación o el contraste.
 #
 # 27.07. Detecta ruido como dígitos
 #
 #   Solución:
-#     - subir el área mínima;
 #     - recortar la imagen;
 #     - limpiar el fondo.
 #
@@ -2547,16 +2509,15 @@
 #
 # 27.11. La app no muestra métricas
 #
-#   Causa: no se ha ejecutado evaluate.
-#   Solución:
+#   Es intencional: la interfaz se limita al reconocimiento. Las métricas se
+#   consultan en results/ o ejecutando:
 #     ..\.venv\Scripts\python.exe main.py evaluate
 #
 # 27.12. La app no muestra K-Means
 #
-#   Causa: no está entrenado o evaluado.
-#   Solución:
-#     ..\.venv\Scripts\python.exe main.py train --model kmeans
-#     ..\.venv\Scripts\python.exe main.py evaluate
+#   Es intencional: K-Means es agrupamiento no supervisado y no forma parte del
+#   flujo de reconocimiento. Sus resultados están en results/ y se regeneran con
+#   main.py train --model kmeans y main.py evaluate.
 #
 # 27.13. Caracteres extraños en la consola
 #
@@ -2708,13 +2669,13 @@
 # [x] Validación cruzada ejecutada.
 # [x] Resultados guardados en CSV, JSON y Markdown.
 # [x] Demo end-to-end con 13/13 secuencias correctas.
-# [x] Aplicación Streamlit con cinco pestañas.
-# [x] Carga de imágenes y selección de ejemplos.
+# [x] Aplicación Streamlit de una sola pantalla.
+# [x] Carga de imágenes y reconocimiento con los cinco modelos.
 # [x] Visualización de máscara, recortes y anotación.
-# [x] Descarga de imagen anotada.
+# [x] Mensajes para imágenes sin trazo y baja confianza.
 # [x] README completo.
 # [x] DOCUMENTACION.md completo.
-# [x] 41 pruebas unitarias aprobadas.
+# [x] 43 pruebas unitarias aprobadas.
 # [x] AppTest sin excepciones.
 # [x] HTTP 200 verificado.
 # [x] Predicción correcta de 2026 verificada.
@@ -2743,7 +2704,7 @@
 #   - Inclusión de comandos de reproducción y solución de problemas.
 #   - Ajuste final: 9 experimentos reales de hiperparámetros de la CNN,
 #     selección por validación, prueba con fotografías reales, aclaración de
-#     fuentes y tipos de datos, unificación de DOCUMENTACION.md, 41 pruebas.
+#     fuentes y tipos de datos, unificación de DOCUMENTACION.md, 43 pruebas.
 #
 # ============================================================================
 #

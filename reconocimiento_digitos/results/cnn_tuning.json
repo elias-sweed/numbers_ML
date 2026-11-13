@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-11-11T23:49:01",
+  "fecha": "2026-11-12T00:20:40",
   "protocolo": "subconjunto estratificado de train; validación completa; test no usado",
   "n_train": 20000,
   "n_val": 6000,
@@ -31,7 +31,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 468010,
-      "tiempo_entrenamiento_s": 59.368,
+      "tiempo_entrenamiento_s": 51.988,
       "usando_test": false,
       "historial": "results\\tuning\\history_base.csv"
     },
@@ -60,7 +60,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 468010,
-      "tiempo_entrenamiento_s": 60.341,
+      "tiempo_entrenamiento_s": 51.527,
       "usando_test": false,
       "historial": "results\\tuning\\history_lr_5e-4.csv"
     },
@@ -89,7 +89,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 468010,
-      "tiempo_entrenamiento_s": 59.592,
+      "tiempo_entrenamiento_s": 50.806,
       "usando_test": false,
       "historial": "results\\tuning\\history_lr_2e-3.csv"
     },
@@ -118,7 +118,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 218586,
-      "tiempo_entrenamiento_s": 26.275,
+      "tiempo_entrenamiento_s": 22.16,
       "usando_test": false,
       "historial": "results\\tuning\\history_filtros_16_32.csv"
     },
@@ -147,7 +147,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 749690,
-      "tiempo_entrenamiento_s": 137.098,
+      "tiempo_entrenamiento_s": 117.762,
       "usando_test": false,
       "historial": "results\\tuning\\history_filtros_48_96.csv"
     },
@@ -176,7 +176,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 468010,
-      "tiempo_entrenamiento_s": 73.533,
+      "tiempo_entrenamiento_s": 52.657,
       "usando_test": false,
       "historial": "results\\tuning\\history_dropout_bajo.csv"
     },
@@ -205,7 +205,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 468010,
-      "tiempo_entrenamiento_s": 66.109,
+      "tiempo_entrenamiento_s": 50.736,
       "usando_test": false,
       "historial": "results\\tuning\\history_dropout_alto.csv"
     },
@@ -234,7 +234,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 468010,
-      "tiempo_entrenamiento_s": 72.121,
+      "tiempo_entrenamiento_s": 51.116,
       "usando_test": false,
       "historial": "results\\tuning\\history_batch_64.csv"
     },
@@ -263,7 +263,7 @@
       "n_train": 20000,
       "n_val": 6000,
       "parametros_entrenables": 468010,
-      "tiempo_entrenamiento_s": 70.06,
+      "tiempo_entrenamiento_s": 54.521,
       "usando_test": false,
       "historial": "results\\tuning\\history_batch_256.csv"
     }

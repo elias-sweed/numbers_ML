@@ -84,8 +84,8 @@ cd C:\\Users\\elias\\Documents\\SARA\\reconocimiento_digitos
 ..\\.venv\\Scripts\\python.exe main.py real-test
 ```
 
-También puedes probar una foto directamente en la app Streamlit, pestaña
-**Reconocer**, con el botón **Subir imagen**.
+También puedes probar una foto directamente en la interfaz web de Streamlit,
+con el botón **Reconocer dígitos**.
 
 ## Reglas de honestidad
 
@@ -171,8 +171,8 @@ def _write_markdown(payload: dict[str, Any]) -> Path:
             "3. Añádela a `data/real_photos/manifest.csv` con `tipo=foto_real`.",
             "4. Ejecuta `python main.py real-test`.",
             "",
-            "También puedes subir la foto directamente en la pestaña Reconocer de",
-            "la aplicación Streamlit.",
+            "También puedes subir la foto directamente en la interfaz web de",
+            "Streamlit.",
             "",
         ]
     else:

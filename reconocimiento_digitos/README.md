@@ -55,8 +55,8 @@ algoritmos y ofrece una interfaz web para probar imágenes propias.
 5. Evalúa con accuracy, precision, recall, F1-score y matriz de confusión.
 6. Genera gráficos de entrenamiento, comparación, predicciones y agrupamiento.
 7. Segmenta varios dígitos en una foto con OpenCV y los reconoce uno a uno.
-8. Ofrece una interfaz Streamlit moderna con carga de imágenes, confianza por
-   dígito, resultados de evaluación y explicación de cada algoritmo.
+8. Ofrece una interfaz Streamlit sencilla: elegir modelo, cargar una imagen y
+   ver el número reconocido con la confianza por dígito.
 
 ---
 
@@ -356,28 +356,26 @@ Desde la carpeta padre, si el `.venv` está en `SARA`:
 
 ### Uso de la interfaz
 
-1. Elige el modelo en la barra lateral (la CNN es la opción recomendada).
-2. Pestaña **Reconocer**:
-   - sube una imagen PNG/JPG/BMP/WEBP, o
-   - selecciona un ejemplo generado a partir del test de MNIST.
-3. Ajusta el **área mínima** si hay ruido o dígitos pequeños.
+1. Elige el modelo en el selector (la CNN es la opción recomendada).
+2. Sube una imagen PNG/JPG/JPEG/BMP/WEBP con uno o varios dígitos.
+3. Pulsa **Reconocer dígitos**.
 4. La app muestra:
    - número reconocido y confianza media;
    - confianza por dígito;
-   - imagen original, máscara binarizada y segmentación anotada;
-   - recortes de 28×28 preparados para el modelo;
-   - distribución de probabilidades del primer dígito;
-   - botón para descargar la imagen anotada.
-5. Pestañas **Evaluación**, **Comparación** y **K-Means**: tablas, matrices de
-   confusión, curvas e interpretación.
-6. Pestaña **Guía**: comandos, limitaciones y estructura del proyecto.
+   - imagen original e imagen procesada (máscara binarizada);
+   - detección de cada dígito y recortes de 28×28 preparados para el modelo.
+
+La interfaz tiene una sola pantalla. No incluye evaluación, comparación,
+K-Means, ajuste de hiperparámetros ni guía técnica; esos recursos siguen
+disponibles en `main.py`, `results/` y `DOCUMENTACION.md` para los requisitos
+académicos.
 
 ### Recomendaciones para fotos reales
 
 - Fondo claro y trazo oscuro; buena iluminación y poco ruido.
 - Deja espacio entre dígitos para que la segmentación funcione.
 - Recorta la zona del número si la foto es muy grande.
-- Si no detecta nada, baja el área mínima; si detecta ruido, súbela.
+- Si no detecta nada, mejora el contraste o recorta más la zona del número.
 - La app está pensada para una línea de dígitos. Para varias líneas, súbelas
   por separado.
 
@@ -417,8 +415,8 @@ python main.py real-test
 El comando procesa solo filas marcadas como `foto_real`, guarda
 `results/real_photos_results.json`, `results/REAL_PHOTOS.md` y las imágenes
 anotadas. Si no hay fotos, el informe indica que la prueba está pendiente y no
-inventa resultados. También puedes subir la foto directamente en la pestaña
-**Reconocer** de Streamlit.
+inventa resultados. También puedes subir la foto directamente en la interfaz
+web de Streamlit.
 
 Instrucciones detalladas: [`data/real_photos/LEEME.md`](data/real_photos/LEEME.md).
 
@@ -471,7 +469,7 @@ Incluye pruebas de:
 - pipeline de predicción con un modelo simulado;
 - formas y etiquetas del dataset preparado.
 
-Estado actual: **41 pruebas aprobadas**.
+Estado actual: **43 pruebas aprobadas**.
 
 ---
 
@@ -597,7 +595,7 @@ Puedes consultar:
 - K-Means es no supervisado y así se reporta; su "accuracy tras mapeo" no debe
   compararse con la de un clasificador.
 - Las imágenes de ejemplo son sintéticas (MNIST + rotación + ruido). Las fotos
-  reales pueden requerir ajuste del área mínima o mejor iluminación.
+  reales pueden requerir mejor iluminación o un recorte más ajustado.
 - No hay fotografías reales incluidas en el repositorio. La prueba con papel
   real está pendiente y debe ejecutarse con `python main.py real-test` después
   de añadir las fotos del usuario.
@@ -621,8 +619,8 @@ Puedes consultar:
 | Streamlit no abre | Ejecuta `python -m streamlit run app.py` o revisa el puerto 8501. |
 | `ModuleNotFoundError: config` | Ejecuta los comandos desde `reconocimiento_digitos`. |
 | El modelo no existe | Entrena: `python main.py train --model cnn`. |
-| No detecta dígitos | Baja el área mínima y usa fondo claro con trazo oscuro. |
-| Detecta ruido como dígitos | Sube el área mínima o recorta la imagen. |
+| No detecta dígitos | Usa fondo claro con trazo oscuro y recorta la zona del número. |
+| Detecta ruido como dígitos | Recorta la imagen y limpia el fondo. |
 | El entrenamiento es lento | Es CPU; puedes reducir épocas en `config.py` o entrenar un subconjunto. |
 
 ---

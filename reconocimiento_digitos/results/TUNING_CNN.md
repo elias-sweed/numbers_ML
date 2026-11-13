@@ -1,6 +1,6 @@
 # Ajuste de hiperparámetros de la CNN
 
-Generado: 2026-11-11T23:49:01
+Generado: 2026-11-12T00:20:40
 
 > Experimentos reales ejecutados sobre un subconjunto estratificado del
 > conjunto de entrenamiento. La selección se hizo exclusivamente con el

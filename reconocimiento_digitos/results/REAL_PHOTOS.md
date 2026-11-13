@@ -16,8 +16,8 @@ Para completar esta prueba:
 3. Añádela a `data/real_photos/manifest.csv` con `tipo=foto_real`.
 4. Ejecuta `python main.py real-test`.
 
-También puedes subir la foto directamente en la pestaña Reconocer de
-la aplicación Streamlit.
+También puedes subir la foto directamente en la interfaz web de
+Streamlit.
 
 ## Archivos
 

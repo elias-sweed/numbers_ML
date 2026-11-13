@@ -114,6 +114,10 @@ def predict_probabilities(
     if model_name == "cnn":
         X = prepare_dataset_for_cnn(batch)
         probs = model.predict(X, verbose=0)
+    elif model_name == "mlp":
+        # La MLP es un modelo Keras, pero espera la imagen aplanada (784).
+        X = prepare_dataset_for_ml(batch)
+        probs = model.predict(X, verbose=0)
     else:
         X = prepare_dataset_for_ml(batch)
         if hasattr(model, "predict_proba"):
